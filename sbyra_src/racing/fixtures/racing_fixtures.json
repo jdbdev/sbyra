@@ -1,0 +1,23 @@
+[
+    {
+        "model": "racing.yacht",
+        "pk": 1,
+        "fields": {
+            "name": "Yacht1"
+        }
+    },
+    {
+        "model": "racing.yacht",
+        "pk": 2,
+        "fields": {
+            "name": "Yacht2"
+        }
+    },
+    {
+        "model": "racing.yacht",
+        "pk": 3,
+        "fields": {
+            "name": "Yacht3"
+        }
+    }
+]
