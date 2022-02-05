@@ -3,21 +3,24 @@
         "model": "racing.yacht",
         "pk": 1,
         "fields": {
-            "name": "Yacht1"
+            "name": "Yacht1",
+            "yacht_class": "A"
         }
     },
     {
         "model": "racing.yacht",
         "pk": 2,
         "fields": {
-            "name": "Yacht2"
+            "name": "Yacht2",
+            "yacht_class": "A1"
         }
     },
     {
         "model": "racing.yacht",
         "pk": 3,
         "fields": {
-            "name": "Yacht3"
+            "name": "Yacht3",
+            "yacht_class": "B"
         }
     }
 ]
