@@ -1,3 +1,4 @@
 from django.contrib import admin
+from sbyra_src.racing import models
 
-# Register your models here.
+admin.site.register(models.Yacht)

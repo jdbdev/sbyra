@@ -1,4 +1,5 @@
 import pytest
+from django.db import IntegrityError
 from django.utils.text import slugify
 from sbyra_src.racing.models import Yacht
 
@@ -13,14 +14,18 @@ Specifications:
 
 """
 
-yacht_data = [(1, "Yacht1", "A"), (2, "Yacht2", "A1"), (3, "Yacht3", "B")]
+yacht_data = [
+    (1, "Yacht1", "A"),
+    (2, "Yacht2", "A1"),
+    (3, "Yacht3", "B"),
+]
 
 
 @pytest.mark.django_db
 def test_load_fixture(load_db_fixtures):
     """Test that fixtures are loading. Only tests if at least one has been loaded."""
-    data = len(Yacht.objects.all())
-    assert data >= 1
+    data = Yacht.objects.all()
+    assert len(data) >= 1
 
 
 @pytest.mark.django_db
@@ -29,22 +34,43 @@ class TestYachtModel:
     def test_yacht_data(self, id, name, yacht_class):
         """Test basic data entry into the model fields"""
         yacht = Yacht.objects.get(id=id)
-        print(yacht.yacht_class)
         assert yacht.id == id
         assert yacht.name == name
+        assert yacht.phrf_rating == None
         assert yacht.yacht_class == yacht_class
+        assert yacht.is_active == False
 
-    def test_slug_signal(self, id, name, yacht_class):
-        """
-        Test verifies that yacht.slug is derived from yacht.name field. Use name field from model and not parametrize
-        value to ensure that signal functions at DB level. Calls slugify function to match signal procedure.
-        """
-        yacht = Yacht.objects.get(id=id)
-        print(yacht.name)
-        print(yacht.slug)
-        assert yacht.slug == slugify(yacht.name)
 
-    @pytest.mark.xfail
-    def test_name_unique(self, id, name, yacht_class):
-        """test that yacht name is unique"""
-        pass
+@pytest.mark.django_db
+def test_slug_signal():
+    """
+    Test validates that yacht.slug is derived from yacht.name field. Use name field from model and not parametrize
+    value to ensure that signal functions at DB level. Calls slugify function to match signal procedure.
+    """
+    yacht = Yacht.objects.get(id=1)
+    assert yacht.slug == slugify(yacht.name)
+
+
+@pytest.mark.django_db
+def test_is_active_signal():
+    """
+    Test validates that adding phrf_rating and yacht_class will call yacht_is_active signal and set is_active = True
+    """
+    yacht1 = Yacht.objects.get(id=1)
+    print(yacht1.is_active)
+    yacht1.yacht_class = "A"
+    yacht1.phrf_rating = 1
+    yacht1.save()
+    print(yacht1.is_active)
+    assert yacht1.is_active == True
+
+
+@pytest.mark.django_db()
+# @pytest.mark.xfail
+def test_name_unique():
+
+    with pytest.raises(IntegrityError):
+        new_yacht1 = Yacht.objects.create(name="NewYacht1")
+        new_yacht1.save()
+        new_yacht2 = Yacht.objects.create(name="NewYacht1")
+        new_yacht2.save()

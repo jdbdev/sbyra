@@ -1,12 +1,11 @@
 from django.conf import settings
 from django.db import models
-from django.db.models.signals import pre_save
-from django.dispatch import receiver
-from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
 from sbyra_src.racing.choices import YachtClassChoices
-
-from .choices import YachtClassChoices
+from sbyra_src.racing.managers import (
+    ActiveYachtManager,
+    DefaultYachtManager,
+)
 
 User = settings.AUTH_USER_MODEL
 
@@ -15,7 +14,7 @@ User = settings.AUTH_USER_MODEL
 All models related to yacht racing including yachts, clubs, events and results. This file contains only models.Model 
 refer to separate files for;
 
-managers.py (all models.Manager classes)
+managers.py (all models.Manager classes and custom methods)
 signals.py (all receiver functions and signals)
 choices.py (all related models.TextChoices classes for choice fields)
 
@@ -25,10 +24,14 @@ Any changes to models to remain explicit and include help_text.
 
 
 class RacingCommon(models.Model):
-    """Abstract class for common time fields"""
+    """Abstract class for common time fields. Use for all models"""
 
-    created = models.DateTimeField(auto_now_add=True, null=True)
-    updated = models.DateTimeField(auto_now=True, null=True)
+    created = models.DateTimeField(
+        auto_now_add=True, null=True
+    )  # null=True temporary only for testing
+    updated = models.DateTimeField(
+        auto_now=True, null=True
+    )  # null=True temporary only for testing
 
     class Meta:
         abstract = True
@@ -37,9 +40,35 @@ class RacingCommon(models.Model):
 class Yacht(RacingCommon):
     """Yacht class describing all attributes of an individual yacht"""
 
-    name = models.CharField(max_length=100, blank=False, null=True, unique=True, help_text=_("enter yacht name"))
-    slug = models.SlugField(blank=True, null=True, help_text=_("web safe url"))
-    yacht_class = models.CharField(max_length=2, choices=YachtClassChoices.choices, blank=True, null=True)
+    name = models.CharField(
+        max_length=100,
+        blank=False,
+        null=True,
+        unique=True,
+        help_text=_("enter yacht name"),
+    )
+    slug = models.SlugField(
+        blank=True, null=True, help_text=_("web safe url")
+    )
+    yacht_class = models.CharField(
+        max_length=2,
+        choices=YachtClassChoices.choices,
+        blank=True,
+        null=True,
+        help_text=_("yacht class required to race"),
+    )
+    phrf_rating = models.IntegerField(
+        blank=True,
+        null=True,
+        help_text=_("phrf rating required to race"),
+    )
+    is_active = models.BooleanField(
+        default=False,
+        help_text=_("requires phrf rating and yacht class"),
+    )
+
+    objects = DefaultYachtManager()  # Yacht.objects.all()
+    active = ActiveYachtManager()  # Yacht.active.all()
 
     class Meta:
         ordering = ["name"]
@@ -59,12 +88,3 @@ class Results(models.Model):
 
 class YachtClub(RacingCommon):
     pass
-
-
-@receiver(pre_save, sender=Yacht)
-def slug_pre_save(sender, instance, *args, **kwargs):
-    """signal to set slug to match name as web safe url"""
-    name = instance.name
-    slug = instance.slug
-    if slug is None:
-        instance.slug = slugify(name)
