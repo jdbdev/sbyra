@@ -1,0 +1,64 @@
+import requests
+from django.shortcuts import render
+
+
+def weather_api(request):
+
+    """
+    API call to openweathermap.org and return a context dictionary
+
+    Values returned in Metric (temp = Celcius, Wind speeds = meters/sec)
+    API does not always return key values. Functions check for keys:values to prevent errors and convert wind speed and wind gusts from meters/second to knots (kt, kn). Values rounded to 2 decimal places.
+
+    """
+
+    api_key = "13b0ed39f5837750c3619e81a11c5143"
+    url = "http://api.openweathermap.org/data/2.5/weather?q={}&units=metric&appid={}"
+    city = "Shediac"
+    r = requests.get(url.format(city, api_key)).json()
+
+    conversion = float(
+        1.9438444924
+    )  # conversion factor for meters/sec to knots
+
+    def wind_speed():
+        """verifies that api returns a value and converts value from m/s to knots"""
+        key = "speed"
+        wind_speed = "unknown"
+
+        if key in r["wind"]:
+            wind_speed = float(r["wind"][key]) * conversion
+        return round(wind_speed, 2)
+
+    def wind_direction():
+        """verifies that api returns a value, and provides the verbose direction from degrees"""
+        key = "deg"
+        wind_direction = "unknown"
+
+        if key in r["wind"]:
+            wind_direction = r["wind"][key]
+        return wind_direction
+
+    def wind_gust():
+        """verifies that api returns and value and converts value from m/s to knots"""
+        key = "gust"
+        wind_gust = "unknown"
+
+        if key in r["wind"]:
+            wind_gust = r["wind"]["gust"]
+        return wind_gust
+
+    weather = {
+        "city": city,
+        "temperature": r["main"]["temp"],
+        "description": r["weather"][0]["description"],
+        "icon": r["weather"][0]["icon"],
+        "wind_speed": wind_speed(),
+        "wind_direction": wind_direction(),
+        "wind_gust": wind_gust(),
+    }
+
+    context = {"weather": weather}
+    print(context)
+
+    return render(request, "weather/weather.html", context)

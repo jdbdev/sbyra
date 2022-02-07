@@ -11,7 +11,7 @@ User = settings.AUTH_USER_MODEL
 
 
 """ 
-All models related to yacht racing including yachts, clubs, events and results. This file contains only models.Model 
+All models related to yacht racing, including yachts, clubs, events and results. This file contains only models.Model 
 refer to separate files for;
 
 managers.py (all models.Manager classes and custom methods)
@@ -76,6 +76,10 @@ class Yacht(RacingCommon):
 
     def __str__(self):
         return self.name
+
+
+class Series(RacingCommon):
+    pass
 
 
 class Event(models.Model):
