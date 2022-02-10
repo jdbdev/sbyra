@@ -1,5 +1,9 @@
+import environ
 import requests
 from django.shortcuts import render
+
+env = environ.Env()
+environ.Env.read_env()
 
 
 def weather_api(request):
@@ -12,7 +16,7 @@ def weather_api(request):
 
     """
 
-    api_key = "13b0ed39f5837750c3619e81a11c5143"
+    api_key = env("WEATHER_API")
     url = "http://api.openweathermap.org/data/2.5/weather?q={}&units=metric&appid={}"
     city = "Shediac"
     r = requests.get(url.format(city, api_key)).json()
