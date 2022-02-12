@@ -20,6 +20,8 @@ yacht_data = [
     (3, "Yacht3", "B"),
 ]
 
+# ------------------- MODEL: YACHT ------------------- #
+
 
 @pytest.mark.django_db
 def test_load_fixture(load_db_fixtures):
@@ -45,7 +47,7 @@ class TestYachtModel:
 def test_slug_signal():
     """
     Test validates that yacht.slug is derived from yacht.name field. Use name field from model and not parametrize
-    value to ensure that signal functions at DB level. Calls slugify function to match signal procedure.
+    value to ensure that signal functions at DB level. Test Calls slugify function to match signal procedure.
     """
     yacht = Yacht.objects.get(id=1)
     assert yacht.slug == slugify(yacht.name)
@@ -74,3 +76,10 @@ def test_name_unique():
         new_yacht1.save()
         new_yacht2 = Yacht.objects.create(name="NewYacht1")
         new_yacht2.save()
+
+
+# ------------------- MODEL: SERIES ------------------- #
+
+# ------------------- MODEL: EVENT -------------------- #
+
+# ------------------- MODEL: RESULT ------------------- #
