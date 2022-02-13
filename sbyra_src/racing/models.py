@@ -1,7 +1,10 @@
 from django.conf import settings
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from sbyra_src.racing.choices import YachtClassChoices
+from sbyra_src.racing.choices import (
+    CompletionStatusChoice,
+    YachtClassChoices,
+)
 from sbyra_src.racing.managers import (
     ActiveYachtManager,
     DefaultYachtManager,
@@ -11,8 +14,8 @@ User = settings.AUTH_USER_MODEL
 
 
 """ 
-All models related to yacht racing, including yachts, clubs, events and results. This file contains only models.Model 
-refer to separate files for;
+All models related to yacht racing, including yachts, clubs, events and results. This file contains only models.Model classes. 
+Refer to separate files for;
 
 managers.py (all models.Manager classes and custom methods)
 signals.py (all receiver functions and signals)
@@ -79,16 +82,80 @@ class Yacht(RacingCommon):
 
 
 class Series(RacingCommon):
-    pass
+    """Series class describing all attributes of a series and linking sets of events"""
+
+    name = models.CharField(
+        max_length=100,
+        blank=False,
+        null=True,
+        unique=True,
+        help_text=_("enter Series' name"),
+    )
+
+    class Meta:
+        ordering = ["name"]
+        verbose_name_plural = "series"
+
+    def __str__(self):
+        return str(self.name)
 
 
 class Event(models.Model):
-    pass
+    """Event class describing all attributes of an event. Start times based on Yacht class field"""
+
+    name = models.DateField(blank=True)
+    series = models.ForeignKey(Series, on_delete=models.CASCADE)
+    start_A_A1 = models.TimeField(blank=True, null=True)
+    start_B = models.TimeField(blank=True, null=True)
+    start_C = models.TimeField(blank=True, null=True)
+    notes = models.TextField(
+        max_length=200,
+        blank=True,
+        help_text="Add relevant event comments",
+    )
+    yachts = models.ManyToManyField(Yacht, through="Result")
+
+    class Meta:
+        ordering = ["name"]
+        verbose_name_plural = "events"
+
+    def __str__(self):
+        return str(self.name)
 
 
 class Results(models.Model):
-    pass
+    """Custom Through table linking the Many to Many relationship between Yacht and Event"""
+
+    event = models.ForeignKey(Event, on_delete=models.CASCADE)
+    yacht = models.ForeignKey(Yacht, on_delete=models.CASCADE)
+    status = models.CharField(
+        max_length=3,
+        choices=CompletionStatusChoice.choices,
+        default="CMP",
+    )
+    finish = models.TimeField()
+    notes = models.TextField(max_length=100, blank=True)
+
+    def __str__(self):
+        return f"{self.event}: {self.yacht}"
+
+    class Meta:
+        unique_together = [["event", "yacht"]]
+        verbose_name_plural = "results"
 
 
 class YachtClub(RacingCommon):
-    pass
+    """Yacht Club information - not required for racing functionality"""
+
+    name = models.CharField(
+        max_length=100,
+        blank=False,
+        null=True,
+        unique=True,
+        help_text=_("enter yacht club name"),
+    )
+    slug = models.SlugField(
+        blank=True,
+        null=True,
+        help_text=_("web safe url"),
+    )
