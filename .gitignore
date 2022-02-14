@@ -9,6 +9,7 @@ __pycache__/
 .vscode/
 settings.json
 commands.txt
+commands.md
 
 
 # C extensions

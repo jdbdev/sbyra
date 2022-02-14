@@ -40,6 +40,23 @@ class RacingCommon(models.Model):
         abstract = True
 
 
+class YachtClub(RacingCommon):
+    """Yacht Club information - not required for racing functionality"""
+
+    name = models.CharField(
+        max_length=100,
+        blank=False,
+        null=True,
+        unique=True,
+        help_text=_("enter yacht club name"),
+    )
+    slug = models.SlugField(
+        blank=True,
+        null=True,
+        help_text=_("web safe url"),
+    )
+
+
 class Yacht(RacingCommon):
     """Yacht class describing all attributes of an individual yacht"""
 
@@ -105,7 +122,7 @@ class Event(models.Model):
 
     name = models.DateField(blank=True)
     series = models.ForeignKey(Series, on_delete=models.CASCADE)
-    start_A_A1 = models.TimeField(blank=True, null=True)
+    start_A = models.TimeField(blank=True, null=True)
     start_B = models.TimeField(blank=True, null=True)
     start_C = models.TimeField(blank=True, null=True)
     notes = models.TextField(
@@ -123,39 +140,54 @@ class Event(models.Model):
         return str(self.name)
 
 
-class Results(models.Model):
-    """Custom Through table linking the Many to Many relationship between Yacht and Event"""
+class Result(models.Model):
+    """Custom Through table linking Many to Many relationship between Yacht and Event"""
 
     event = models.ForeignKey(Event, on_delete=models.CASCADE)
     yacht = models.ForeignKey(Yacht, on_delete=models.CASCADE)
-    status = models.CharField(
+    completed_status = models.CharField(
         max_length=3,
         choices=CompletionStatusChoice.choices,
-        default="CMP",
+        default="CMP",  # check syntax - use default = choices.CMP?
     )
-    finish = models.TimeField()
+    finish_time = models.TimeField(blank=True, null=True)
+    posted_time = models.TimeField(blank=True, null=True)
     notes = models.TextField(max_length=100, blank=True)
+
+    class Meta:
+        ordering = ["-posted_time"]
+        unique_together = [["event", "yacht"]]
+        verbose_name_plural = "results"
 
     def __str__(self):
         return f"{self.event}: {self.yacht}"
 
-    class Meta:
-        unique_together = [["event", "yacht"]]
-        verbose_name_plural = "results"
+    @property
+    def final_result(self):
+        """
+        Property returns the yacht's race result based on its class start time, PHRF rating and finish time.
+        Returns race result only for active yachts that have completed the event. Returns None for all other yachts.
+        """
+        completed = self.completed_status
+        active_status = self.yacht.is_active
+        yacht_class = self.yacht.yacht_class
 
+        if active_status and completed == True:
+            if yacht_class == "A" or "A1":
+                start_time = self.event.start_A
+            elif yacht_class == "B":
+                start_time = self.event.start_B
+            elif yacht_class == "C":
+                start_time = self.event.start_C
 
-class YachtClub(RacingCommon):
-    """Yacht Club information - not required for racing functionality"""
+            phrf_rating = self.yacht.phrf_rating
+            time_delta = start_time - self.finish_time
+            race_time = time_delta * phrf_rating
+            return race_time
+        else:
+            return None
 
-    name = models.CharField(
-        max_length=100,
-        blank=False,
-        null=True,
-        unique=True,
-        help_text=_("enter yacht club name"),
-    )
-    slug = models.SlugField(
-        blank=True,
-        null=True,
-        help_text=_("web safe url"),
-    )
+    def save(self, *args, **kwargs):
+        """override default save() method to capture posted_time by accessing the final_result property"""
+        self.posted_time = self.final_result
+        super(Result, self).save(*args, **kwargs)

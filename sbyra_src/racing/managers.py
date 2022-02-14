@@ -1,5 +1,7 @@
 from django.db import models
 
+# ------------------- MODEL: YACHT ------------------- #
+
 
 class ActiveYachtManager(models.Manager):
     """Custom Yacht object Manager that filters for active Yachts only with additional methods"""
@@ -19,3 +21,8 @@ class DefaultYachtManager(models.Manager):
 
     def active(self):  # Yacht.objects.active()
         return self.filter(is_active=True)
+
+
+# ------------------- MODEL: EVENT ------------------- #
+
+# ------------------- MODEL: RESULTS ------------------#

@@ -2,32 +2,41 @@
 blue { color: #0277bd }
 </style>
 
-# Shediac Bay Yacht Racing Association (SBYRA) documentation
+# Shediac Bay Yacht Racing Association (SBYRA)
 
 *SBYRA is a single user group application as part of a larger application in development (WINCH) for yacht and regatta management*
 
-## 1. Basic Implementation: 
+## 1.Basic Implementation: 
 
 - App allows users to register their yachts for the local racing club and events. Admin staff can create regatta events and event series to track all racing data and results. 
 - Weather app connects to an API to display and register weather data at various current and event times.
 - Main web interface allows users and non-users to view event results and browse public yatch and event info.
 
-## 2. Future additions:
+## 2.Future additions:
 
 - Local chat feature
 - Local buy & sell feature
 - result visualisation 
 
-## 3. Contributors:
+## 3.Tech stack
+
+- Python Django
+- Pytest-Django
+- HTML / HTMX
+- Tailwind CSS
+- JS AlpineJS
+- PostresQL
+
+## 4.Contributors:
 
 Julien Boudreau - Creator, Lead Developer, Lead UI and UX Design. 
 
-## Project Structure:
+## 5.Project Structure:
 
 sbyra_src
-  - accounts (User, Profile)
-  - racing (Yacht, Series, Event, Result )
-  - weather (openweathermap.org api call)
+  - accounts (App)
+  - racing (App)
+  - weather (App - openweathermap.org api call)
   - tests (pytest testing suite)
   - settings.py
   - urls.py
@@ -38,6 +47,8 @@ manage.py
 ## Racing Model Schema:
 
 Staff <blue>Users</blue> create <blue>Series</blue> to hold a set of regattas or racing events (yearly, monthly, weekly, etc.). Once a series is created, various events can be added, modified and evaluated. The <blue>Event</blue> has a ForeignKey relationship to the <blue>Series</blue>. <blue>Yacht</blue> and <blue>Event</blue> have a Many to Many relationship linked by a through table <blue>Result</blue>. The <blue>Result</blue> table contains individual yacht results for various events. 
+
+The core of the project relies on the Racing app schema and the Result table. The Result table links an individual Yacht to an individual Event. As an Event has varying start times for different yacht classes, the Result table provides the logic to determine the final result based on a yacht's start time (assciated to it's class), finish time and phrf rating.
 
 ### Basic Queries:
 
