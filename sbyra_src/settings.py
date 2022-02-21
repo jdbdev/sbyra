@@ -61,7 +61,7 @@ TEMPLATES = [
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
-                "sbyra_src.weather.processors.weather_api"
+                # "sbyra_src.weather.processors.weather_api"
                 "django.template.context_processors.debug",
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",

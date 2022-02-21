@@ -35,6 +35,7 @@ Julien Boudreau - Creator, Lead Developer, Lead UI and UX Design.
 
 sbyra_src
   - accounts (App)
+  - demo (run demo app in server)
   - racing (App)
   - weather (App - openweathermap.org api call)
   - tests (pytest testing suite)
@@ -48,7 +49,16 @@ manage.py
 
 Staff <blue>Users</blue> create <blue>Series</blue> to hold a set of regattas or racing events (yearly, monthly, weekly, etc.). Once a series is created, various events can be added, modified and evaluated. The <blue>Event</blue> has a ForeignKey relationship to the <blue>Series</blue>. <blue>Yacht</blue> and <blue>Event</blue> have a Many to Many relationship linked by a through table <blue>Result</blue>. The <blue>Result</blue> table contains individual yacht results for various events. 
 
-The core of the project relies on the Racing app schema and the Result table. The Result table links an individual Yacht to an individual Event. As an Event has varying start times for different yacht classes, the Result table provides the logic to determine the final result based on a yacht's start time (assciated to it's class), finish time and phrf rating.
+The core of the project relies on the Racing app schema and the Result table. The Result table links an individual Yacht to an individual Event. As an Event has varying start times for different yacht racing classes, the Result table provides the logic to determine the final result based on a yacht's start time (assciated to it's class), finish time and phrf rating. A time correction algorithm in the Result calcultes the results following;
+
+    Corrected Time Algorithm:
+
+    1. Establish start time based on yacht_class
+    2. Convert start time and finish time to seconds for further processing
+    3. Calculate elapsed time in seconds between start time and finish time
+    4. Apply time correction factor based on phrf_rating and known formula
+    5. Convert corrected time above (seconds) into datetime.time object for model TimeField()
+    6. Save final datetime.time object into Result.posted_time
 
 ### Basic Queries:
 

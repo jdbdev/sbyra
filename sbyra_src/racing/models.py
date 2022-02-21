@@ -1,3 +1,5 @@
+import datetime
+
 from django.conf import settings
 from django.db import models
 from django.utils.translation import gettext_lazy as _
@@ -77,7 +79,9 @@ class Yacht(RacingCommon):
         null=True,
         help_text=_("yacht class required to race"),
     )
-    phrf_rating = models.IntegerField(
+    phrf_rating = models.DecimalField(
+        max_digits=4,
+        decimal_places=3,
         blank=True,
         null=True,
         help_text=_("phrf rating required to race"),
@@ -106,7 +110,12 @@ class Series(RacingCommon):
         blank=False,
         null=True,
         unique=True,
-        help_text=_("enter Series' name"),
+        help_text=_("Example: Weekly Regatta"),
+    )
+    year = models.IntegerField(
+        blank=True,
+        null=True,
+        help_text=_("Example: 2020"),
     )
 
     class Meta:
@@ -149,10 +158,22 @@ class Result(models.Model):
         max_length=3,
         choices=CompletionStatusChoice.choices,
         default="CMP",  # check syntax - use default = choices.CMP?
+        help_text=_("race completion status"),
     )
-    finish_time = models.TimeField(blank=True, null=True)
-    posted_time = models.TimeField(blank=True, null=True)
-    notes = models.TextField(max_length=100, blank=True)
+    finish_time = models.TimeField(
+        blank=True, null=True, help_text=_("finish line time")
+    )
+    time_penalty = models.TimeField(
+        blank=True, null=True, help_text=_("add applied penalty time")
+    )
+    posted_time = models.TimeField(
+        blank=True,
+        null=True,
+        help_text=_("adjusted for yacht class and phrf rating"),
+    )
+    notes = models.TextField(
+        max_length=100, blank=True, help_text=_("add any result notes")
+    )
 
     class Meta:
         ordering = ["-posted_time"]
@@ -163,16 +184,50 @@ class Result(models.Model):
         return f"{self.event}: {self.yacht}"
 
     @property
-    def final_result(self):
+    def calculated_time(self):
         """
-        Property returns the yacht's race result based on its class start time, PHRF rating and finish time.
-        Returns race result only for active yachts that have completed the event. Returns None for all other yachts.
+        Returns the yacht's corrected time based on its elapsed time and time correction factor, and applies any penalties
+        Returns result only for active yachts that have completed the event. Returns None for all other yachts.
+
+        sbyra time correction factor used: 650/(520 + phrf_rating)
+
+        Corrected Time Algorithm:
+
+        1. Establish start time based on yacht_class
+        2. Convert start time and finish time to seconds for further processing
+        3. Calculate elapsed time in seconds between start time and finish time
+        4. Apply time correction factor based on phrf_rating and known formula
+        5. Convert corrected time above (seconds) into datetime.time object for model TimeField()
+        6. Save final datetime.time object into Result.posted_time
+
         """
-        completed = self.completed_status
+
+        def convert_to_seconds(x):
+            """Function takes a datetime.time object and converts into seconds"""
+            seconds = (x.hour * 3600) + (x.minute * 60) + (x.second)
+            return seconds
+
+        def convert_to_time_object(x):
+            """Function converts string to datetime.time object and returns a list [%H, %M, %S]"""
+            min, sec = divmod(x, 60)
+            hour, min = divmod(min, 60)
+            return [hour, min, sec]
+
+        # ESTABLISH COMPLETED STATUS:
+        if self.completed_status == "CMP":
+            completed = True
+        else:
+            completed = False
+
+        # ESTABLISH ALL FIXED VARIABLES:
         active_status = self.yacht.is_active
         yacht_class = self.yacht.yacht_class
+        phrf_rating = self.yacht.phrf_rating
+        time_correction_factor = 650 / (520 + phrf_rating)
+        penalty = self.time_penalty
 
-        if active_status and completed == True:
+        # ESTABLISH START TIME BY RACING CLASS:
+        if active_status and completed:
             if yacht_class == "A" or "A1":
                 start_time = self.event.start_A
             elif yacht_class == "B":
@@ -180,14 +235,29 @@ class Result(models.Model):
             elif yacht_class == "C":
                 start_time = self.event.start_C
 
-            phrf_rating = self.yacht.phrf_rating
-            time_delta = start_time - self.finish_time
-            race_time = time_delta * phrf_rating
-            return race_time
+            # CONVERT START AND FINISH TIME TO SECONDS:
+            start = convert_to_seconds(start_time)
+            finish = convert_to_seconds(self.finish_time)
+            penalty = convert_to_seconds(self.time_penalty)
+
+            # APPLY CORRECTIONS:
+            elapsed_time = (finish - start) + penalty
+            corrected_time = elapsed_time * time_correction_factor
+
+            # CONVERT SECONDS TO DATETIME.TIME OBJECT:
+            final_time = convert_to_time_object(corrected_time)
+            t1 = final_time[0]  # hours
+            t2 = final_time[1]  # minutes
+            t3 = final_time[2]  # seconds
+            time_obj = datetime.time(t1, t2, t3)
+
+            # RETURN DATETIME.TIME OBJECT:
+            return time_obj
+
         else:
             return None
 
     def save(self, *args, **kwargs):
-        """override default save() method to capture posted_time by accessing the final_result property"""
-        self.posted_time = self.final_result
+        """override default save() method to capture posted_time by accessing the calculated_time property"""
+        self.posted_time = self.calculated_time
         super(Result, self).save(*args, **kwargs)
