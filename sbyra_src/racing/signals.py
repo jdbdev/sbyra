@@ -1,8 +1,11 @@
-from django.db.models.signals import pre_save
+from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 from django.utils.text import slugify
 
-from .models import Yacht
+from .models import Result, Yacht
+
+# ------------------- MODEL: YachtClub ------------------- #
+# --------------------- MODEL: Yacht --------------------- #
 
 
 @receiver(pre_save, sender=Yacht)
@@ -20,3 +23,8 @@ def yacht_is_active(sender, instance, *args, **kwargs):
     if instance.phrf_rating is not None:
         if instance.yacht_class is not None:
             instance.is_active = True
+
+
+# ------------------- MODEL: Series ------------------- #
+# ------------------- MODEL: Event -------------------- #
+# ------------------- MODEL: Result ------------------- #

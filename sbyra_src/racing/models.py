@@ -161,15 +161,15 @@ class Result(models.Model):
         help_text=_("race completion status"),
     )
     finish_time = models.TimeField(
-        blank=True, null=True, help_text=_("finish line time")
+        blank=True, null=True, help_text=_("Format: HH:MM:SS")
     )
     time_penalty = models.TimeField(
-        blank=True, null=True, help_text=_("add applied penalty time")
+        blank=True, null=True, help_text=_("Format: HH:MM:SS")
     )
     posted_time = models.TimeField(
         blank=True,
         null=True,
-        help_text=_("adjusted for yacht class and phrf rating"),
+        help_text=_("Format: HH:MM:SS"),
     )
     notes = models.TextField(
         max_length=100, blank=True, help_text=_("add any result notes")
@@ -184,7 +184,19 @@ class Result(models.Model):
         return f"{self.event}: {self.yacht}"
 
     @property
-    def calculated_time(self):
+    def class_start(self):
+        """Returs racing class start time for the yacht in that event"""
+        yacht_class = self.yacht.yacht_class
+        if yacht_class == "A" or "A1":
+            start = self.event.start_A
+        elif yacht_class == "B":
+            start = self.event.start_B
+        elif yacht_class == "C":
+            start = self.event.start_C
+        return start
+
+    @property
+    def calc_corrected_time(self):
         """
         Returns the yacht's corrected time based on its elapsed time and time correction factor, and applies any penalties
         Returns result only for active yachts that have completed the event. Returns None for all other yachts.
@@ -202,16 +214,20 @@ class Result(models.Model):
 
         """
 
-        def convert_to_seconds(x):
+        def convert_to_seconds(time_obj):
             """Function takes a datetime.time object and converts into seconds"""
-            seconds = (x.hour * 3600) + (x.minute * 60) + (x.second)
+            seconds = (
+                (time_obj.hour * 3600)
+                + (time_obj.minute * 60)
+                + (time_obj.second)
+            )
             return seconds
 
-        def convert_to_time_object(x):
-            """Function converts string to datetime.time object and returns a list [%H, %M, %S]"""
-            min, sec = divmod(x, 60)
+        def convert_to_time_object(seconds):
+            """Function converts string to datetime.time object"""
+            min, sec = divmod(seconds, 60)
             hour, min = divmod(min, 60)
-            return [hour, min, sec]
+            return datetime.time(hour, min, sec)
 
         # ESTABLISH COMPLETED STATUS:
         if self.completed_status == "CMP":
@@ -235,21 +251,20 @@ class Result(models.Model):
             elif yacht_class == "C":
                 start_time = self.event.start_C
 
-            # CONVERT START AND FINISH TIME TO SECONDS:
+            # CONVERT START, FINISH TIME AND PENALTY TO SECONDS:
             start = convert_to_seconds(start_time)
             finish = convert_to_seconds(self.finish_time)
-            penalty = convert_to_seconds(self.time_penalty)
+            if self.time_penalty is not None:
+                penalty = convert_to_seconds(self.time_penalty)
+            else:
+                penalty = 0
 
             # APPLY CORRECTIONS:
-            elapsed_time = (finish - start) + penalty
+            elapsed_time = finish - start + penalty
             corrected_time = elapsed_time * time_correction_factor
 
             # CONVERT SECONDS TO DATETIME.TIME OBJECT:
-            final_time = convert_to_time_object(corrected_time)
-            t1 = final_time[0]  # hours
-            t2 = final_time[1]  # minutes
-            t3 = final_time[2]  # seconds
-            time_obj = datetime.time(t1, t2, t3)
+            time_obj = convert_to_time_object(corrected_time)
 
             # RETURN DATETIME.TIME OBJECT:
             return time_obj
@@ -258,6 +273,6 @@ class Result(models.Model):
             return None
 
     def save(self, *args, **kwargs):
-        """override default save() method to capture posted_time by accessing the calculated_time property"""
-        self.posted_time = self.calculated_time
+        """override default save() method to capture posted_time by calling the calc_corrected_time @property/function"""
+        self.posted_time = self.calc_corrected_time
         super(Result, self).save(*args, **kwargs)
