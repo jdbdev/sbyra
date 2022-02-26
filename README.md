@@ -35,7 +35,7 @@ Julien Boudreau - Creator, Lead Developer, Lead UI and UX Design.
 
 sbyra_src
   - accounts (App)
-  - demo (run demo app in server)
+  - demo (run demo from cmd line)
   - racing (App)
   - weather (App - openweathermap.org api call)
   - tests (pytest testing suite)
@@ -84,3 +84,10 @@ Yacht.objects.by_class('X')
 ```
 Yacht.active.by_class('X')
 ```
+
+## Run Demo: 
+
+1. Dowload / Close repository and paste in project folder
+2. create virtual environment
+3. Install requirements.txt 
+4. Run Demo command; 

@@ -20,14 +20,15 @@ yacht_data = [
     (3, "Yacht3", "B"),
 ]
 
-# ------------------- MODEL: YACHT ------------------- #
-
 
 @pytest.mark.django_db
 def test_load_fixture(load_db_fixtures):
     """Test that fixtures are loading. Only tests if at least one has been loaded."""
     data = Yacht.objects.all()
     assert len(data) >= 1
+
+
+# ------------------- MODEL: YACHT ------------------- #
 
 
 @pytest.mark.django_db

@@ -3,14 +3,8 @@ import datetime
 from django.conf import settings
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from sbyra_src.racing.choices import (
-    CompletionStatusChoice,
-    YachtClassChoices,
-)
-from sbyra_src.racing.managers import (
-    ActiveYachtManager,
-    DefaultYachtManager,
-)
+from sbyra_src.racing.choices import CompletionStatusChoice, YachtClassChoices
+from sbyra_src.racing.managers import ActiveYachtManager, DefaultYachtManager
 
 User = settings.AUTH_USER_MODEL
 
@@ -70,21 +64,33 @@ class Yacht(RacingCommon):
         help_text=_("enter yacht name"),
     )
     slug = models.SlugField(
-        blank=True, null=True, help_text=_("web safe url")
+        blank=True,
+        null=True,
+        help_text=_("web safe url"),
+        verbose_name="Web safe URL",
+    )
+    sail_num = models.CharField(
+        max_length=25,
+        blank=True,
+        help_text=_("Main sail number"),
+        verbose_name="sail number",
+    )
+    yacht_type = models.CharField(
+        max_length=50, blank=True, help_text=_("Type of yacht")
     )
     yacht_class = models.CharField(
         max_length=2,
         choices=YachtClassChoices.choices,
         blank=True,
         null=True,
-        help_text=_("yacht class required to race"),
+        help_text=_("required to race"),
     )
     phrf_rating = models.DecimalField(
         max_digits=4,
-        decimal_places=3,
+        decimal_places=1,
         blank=True,
         null=True,
-        help_text=_("phrf rating required to race"),
+        help_text=_("required to race"),
     )
     is_active = models.BooleanField(
         default=False,
@@ -126,14 +132,20 @@ class Series(RacingCommon):
         return str(self.name)
 
 
-class Event(models.Model):
+class Event(RacingCommon):
     """Event class describing all attributes of an event. Start times based on Yacht class field"""
 
-    name = models.DateField(blank=True)
-    series = models.ForeignKey(Series, on_delete=models.CASCADE)
+    event_date = models.DateField(blank=True)
+    series = models.ForeignKey(
+        Series, related_name="events", on_delete=models.CASCADE
+    )
+    first_flag_A = models.TimeField(blank=True, null=True)
+    first_flag_B = models.TimeField(blank=True, null=True)
+    first_flag_C = models.TimeField(blank=True, null=True)
     start_A = models.TimeField(blank=True, null=True)
     start_B = models.TimeField(blank=True, null=True)
     start_C = models.TimeField(blank=True, null=True)
+    start_J = models.TimeField(blank=True, null=True)
     notes = models.TextField(
         max_length=200,
         blank=True,
@@ -142,14 +154,14 @@ class Event(models.Model):
     yachts = models.ManyToManyField(Yacht, through="Result")
 
     class Meta:
-        ordering = ["name"]
+        ordering = ["event_date"]
         verbose_name_plural = "events"
 
     def __str__(self):
         return str(self.name)
 
 
-class Result(models.Model):
+class Result(RacingCommon):
     """Custom Through table linking Many to Many relationship between Yacht and Event"""
 
     event = models.ForeignKey(Event, on_delete=models.CASCADE)
@@ -163,6 +175,7 @@ class Result(models.Model):
     finish_time = models.TimeField(
         blank=True, null=True, help_text=_("Format: HH:MM:SS")
     )
+    over_line = models.IntegerField()
     time_penalty = models.TimeField(
         blank=True, null=True, help_text=_("Format: HH:MM:SS")
     )
@@ -185,7 +198,7 @@ class Result(models.Model):
 
     @property
     def class_start(self):
-        """Returs racing class start time for the yacht in that event"""
+        """Returns racing class start time for the yacht in that event"""
         yacht_class = self.yacht.yacht_class
         if yacht_class == "A" or "A1":
             start = self.event.start_A
@@ -193,12 +206,14 @@ class Result(models.Model):
             start = self.event.start_B
         elif yacht_class == "C":
             start = self.event.start_C
+        elif yacht_class == "J":
+            start = self.event.start_J
         return start
 
     @property
     def calc_corrected_time(self):
         """
-        Returns the yacht's corrected time based on its elapsed time and time correction factor, and applies any penalties
+        Returns the yacht's corrected time based on its elapsed time and time correction factor, and applies any penalties.
         Returns result only for active yachts that have completed the event. Returns None for all other yachts.
 
         sbyra time correction factor used: 650/(520 + phrf_rating)
@@ -229,20 +244,20 @@ class Result(models.Model):
             hour, min = divmod(min, 60)
             return datetime.time(hour, min, sec)
 
-        # ESTABLISH COMPLETED STATUS:
+        # Establish completed status:
         if self.completed_status == "CMP":
             completed = True
         else:
             completed = False
 
-        # ESTABLISH ALL FIXED VARIABLES:
+        # Establish instance values:
         active_status = self.yacht.is_active
         yacht_class = self.yacht.yacht_class
         phrf_rating = self.yacht.phrf_rating
         time_correction_factor = 650 / (520 + phrf_rating)
         penalty = self.time_penalty
 
-        # ESTABLISH START TIME BY RACING CLASS:
+        # Establish start time based on yacht's class and event class start:
         if active_status and completed:
             if yacht_class == "A" or "A1":
                 start_time = self.event.start_A
@@ -251,7 +266,7 @@ class Result(models.Model):
             elif yacht_class == "C":
                 start_time = self.event.start_C
 
-            # CONVERT START, FINISH TIME AND PENALTY TO SECONDS:
+            # Convert all times to seconds:
             start = convert_to_seconds(start_time)
             finish = convert_to_seconds(self.finish_time)
             if self.time_penalty is not None:
@@ -259,14 +274,14 @@ class Result(models.Model):
             else:
                 penalty = 0
 
-            # APPLY CORRECTIONS:
+            # Calculate elapsed time and apply Time Correction Factor:
             elapsed_time = finish - start + penalty
             corrected_time = elapsed_time * time_correction_factor
 
-            # CONVERT SECONDS TO DATETIME.TIME OBJECT:
+            # Convert seconds into datetime.time object:
             time_obj = convert_to_time_object(corrected_time)
 
-            # RETURN DATETIME.TIME OBJECT:
+            # Return datetime.time object:
             return time_obj
 
         else:
