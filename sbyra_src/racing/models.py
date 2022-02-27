@@ -260,16 +260,16 @@ class Result(RacingCommon):
         else:
             completed = False
 
-        # Establish fixed variables:
+        # Establish all required variables:
         active_status = self.yacht.is_active
-        yacht_class = self.yacht.yacht_class
         phrf_rating = self.yacht.phrf_rating
         time_correction_factor = 650 / (520 + phrf_rating)
+        start_time = self.yacht_class_start
+        finish_time = self.finish_time
         penalty = self.time_penalty
 
         # Establish start time based on yacht's class and event class start:
         if active_status and completed:
-            start_time = self.yacht_class_start
 
             # if yacht_class == "A" or "A1":
             #     start_time = self.event.start_A
@@ -282,7 +282,7 @@ class Result(RacingCommon):
 
             # Convert all times to seconds:
             start = convert_to_seconds(start_time)
-            finish = convert_to_seconds(self.finish_time)
+            finish = convert_to_seconds(finish_time)
             if self.time_penalty is not None:
                 penalty = convert_to_seconds(self.time_penalty)
             else:
