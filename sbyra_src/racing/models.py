@@ -10,6 +10,8 @@ from sbyra_src.racing.choices import (
 )
 from sbyra_src.racing.managers import (
     ActiveYachtManager,
+    CurrentYearSeriesManager,
+    DefaultSeriesManager,
     DefaultYachtManager,
 )
 
@@ -125,6 +127,7 @@ class Series(RacingCommon):
         blank=False,
         null=True,
         unique=True,
+        verbose_name="Series Name",
         help_text=_("Example: Weekly Regatta"),
     )
     year = models.IntegerField(
@@ -133,13 +136,30 @@ class Series(RacingCommon):
         help_text=_("Format: 2020"),
         validators=[validate_year],
     )
+    current_year = models.BooleanField(
+        default=True, help_text=_("archived if not current year")
+    )
+    notes = models.TextField(
+        max_length=500, help_text=_("maximum 500 characters")
+    )
+
+    objects = DefaultSeriesManager()
+    current = CurrentYearSeriesManager()
 
     class Meta:
         ordering = ["name"]
         verbose_name_plural = "series"
 
     def __str__(self):
-        return str(self.name)
+        return f"{self.name} {self.year}"
+
+    def save(self, *args, **kwargs):
+        t_now = datetime.datetime.now()
+        t1 = self.year
+        t2 = t_now.year
+        if t1 < t2:
+            self.current_year = False
+        super(Series, self).save(*args, **kwargs)
 
 
 class Event(RacingCommon):

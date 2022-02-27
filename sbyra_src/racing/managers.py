@@ -1,6 +1,6 @@
 from django.db import models
 
-# ------------------- MODEL: YACHT ------------------- #
+# ------------------- MODEL: Yacht ------------------- #
 
 
 class ActiveYachtManager(models.Manager):
@@ -23,6 +23,18 @@ class DefaultYachtManager(models.Manager):
         return self.filter(is_active=True)
 
 
-# ------------------- MODEL: EVENT ------------------- #
+# ------------------- MODEL: Series ------------------- #
 
-# ------------------- MODEL: RESULTS ------------------#
+
+class DefaultSeriesManager(models.Manager):
+    """Default Series.objects.all() manager with additional filtering by_year"""
+
+    def by_year(self, x):  # series.objects.by_year(x)
+        return self.filter(year=x)
+
+
+class CurrentYearSeriesManager(models.Manager):
+    """Series.current.all() object manager returns only current_year == True instances"""
+
+    def get_queryset(self):  # Series.current.all()
+        return super().get_queryset().filter(current_year=True)
