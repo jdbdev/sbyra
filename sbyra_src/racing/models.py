@@ -3,8 +3,17 @@ import datetime
 from django.conf import settings
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from sbyra_src.racing.choices import CompletionStatusChoice, YachtClassChoices
-from sbyra_src.racing.managers import ActiveYachtManager, DefaultYachtManager
+from pyparsing import Regex
+from sbyra_src.racing.choices import (
+    CompletionStatusChoice,
+    YachtClassChoices,
+)
+from sbyra_src.racing.managers import (
+    ActiveYachtManager,
+    DefaultYachtManager,
+)
+
+from .validators import validate_year
 
 User = settings.AUTH_USER_MODEL
 
@@ -23,7 +32,7 @@ Any changes to models to remain explicit and include help_text.
 
 
 class RacingCommon(models.Model):
-    """Abstract class for common time fields. Use for all models"""
+    """Abstract class for common time fields"""
 
     created = models.DateTimeField(
         auto_now_add=True, null=True
@@ -121,7 +130,8 @@ class Series(RacingCommon):
     year = models.IntegerField(
         blank=True,
         null=True,
-        help_text=_("Example: 2020"),
+        help_text=_("Format: 2020"),
+        validators=[validate_year],
     )
 
     class Meta:
@@ -197,18 +207,18 @@ class Result(RacingCommon):
         return f"{self.event}: {self.yacht}"
 
     @property
-    def class_start(self):
-        """Returns racing class start time for the yacht in that event"""
+    def yacht_class_start(self):
+        """Returns racing class start time for a specific yacht in a specific event based on yacht racing class"""
         yacht_class = self.yacht.yacht_class
         if yacht_class == "A" or "A1":
-            start = self.event.start_A
+            class_start = self.event.start_A
         elif yacht_class == "B":
-            start = self.event.start_B
+            class_start = self.event.start_B
         elif yacht_class == "C":
-            start = self.event.start_C
+            class_start = self.event.start_C
         elif yacht_class == "J":
-            start = self.event.start_J
-        return start
+            class_start = self.event.start_J
+        return class_start
 
     @property
     def calc_corrected_time(self):
@@ -220,7 +230,7 @@ class Result(RacingCommon):
 
         Corrected Time Algorithm:
 
-        1. Establish start time based on yacht_class
+        1. Establish start time based on yach's racing class and event's corresponding start time
         2. Convert start time and finish time to seconds for further processing
         3. Calculate elapsed time in seconds between start time and finish time
         4. Apply time correction factor based on phrf_rating and known formula
@@ -250,7 +260,7 @@ class Result(RacingCommon):
         else:
             completed = False
 
-        # Establish instance values:
+        # Establish fixed variables:
         active_status = self.yacht.is_active
         yacht_class = self.yacht.yacht_class
         phrf_rating = self.yacht.phrf_rating
@@ -259,12 +269,16 @@ class Result(RacingCommon):
 
         # Establish start time based on yacht's class and event class start:
         if active_status and completed:
-            if yacht_class == "A" or "A1":
-                start_time = self.event.start_A
-            elif yacht_class == "B":
-                start_time = self.event.start_B
-            elif yacht_class == "C":
-                start_time = self.event.start_C
+            start_time = self.yacht_class_start
+
+            # if yacht_class == "A" or "A1":
+            #     start_time = self.event.start_A
+            # elif yacht_class == "B":
+            #     start_time = self.event.start_B
+            # elif yacht_class == "C":
+            #     start_time = self.event.start_C
+            # elif yacht_class == "J":
+            #     start_time = self.event.start_J
 
             # Convert all times to seconds:
             start = convert_to_seconds(start_time)
@@ -275,14 +289,14 @@ class Result(RacingCommon):
                 penalty = 0
 
             # Calculate elapsed time and apply Time Correction Factor:
-            elapsed_time = finish - start + penalty
+            elapsed_time = (finish - start) + penalty
             corrected_time = elapsed_time * time_correction_factor
 
             # Convert seconds into datetime.time object:
-            time_obj = convert_to_time_object(corrected_time)
+            corrected_time_obj = convert_to_time_object(corrected_time)
 
             # Return datetime.time object:
-            return time_obj
+            return corrected_time_obj
 
         else:
             return None

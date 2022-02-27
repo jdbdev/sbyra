@@ -13,12 +13,19 @@ Specifications:
 5. Test that slug takes name as input 
 
 """
+yachtclub_data = []
 
 yacht_data = [
     (1, "Yacht1", "A"),
     (2, "Yacht2", "A1"),
     (3, "Yacht3", "B"),
 ]
+
+event_data = []
+
+series_data = []
+
+result_data = []
 
 
 @pytest.mark.django_db
@@ -80,6 +87,7 @@ def test_name_unique():
 
 
 # ------------------- MODEL: SERIES ------------------- #
+
 
 # ------------------- MODEL: EVENT -------------------- #
 
