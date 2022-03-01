@@ -62,7 +62,5 @@ def weather_api(request):
         "wind_gust": wind_gust(),
     }
 
-    context = {"weather": weather}
-    print(context)
-
-    return render(request, "weather/weather.html", context)
+    # return render(request, "weather/weather.html", context)
+    return {"weather": weather}
