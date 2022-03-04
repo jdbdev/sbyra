@@ -199,7 +199,7 @@ class Result(RacingCommon):
     completed_status = models.CharField(
         max_length=3,
         choices=CompletionStatusChoice.choices,
-        default="CMP",  # check syntax - use default = choices.CMP?
+        default="CMP",
         help_text=_("race completion status"),
     )
     finish_time = models.TimeField(

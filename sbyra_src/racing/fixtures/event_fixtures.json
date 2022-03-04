@@ -1,0 +1,26 @@
+[
+    {
+        "model": "racing.event",
+        "pk": 1,
+        "fields": {
+            "event_date": "2022-06-07",
+            "series": 1
+        }
+    },
+    {
+        "model": "racing.event",
+        "pk": 2,
+        "fields": {
+            "event_date": "2022-06-14",
+            "series": 1
+        }
+    },
+    {
+        "model": "racing.event",
+        "pk": 3,
+        "fields": {
+            "event_date": "2022-06-21",
+            "series": 2
+        }
+    }
+]
