@@ -3,7 +3,6 @@ import datetime
 from django.conf import settings
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from pyparsing import Regex
 from sbyra_src.racing.choices import (
     CompletionStatusChoice,
     YachtClassChoices,
@@ -27,6 +26,7 @@ Refer to separate files for;
 managers.py (all models.Manager classes and custom methods)
 signals.py (all receiver functions and signals)
 choices.py (all related models.TextChoices classes for choice fields)
+validators.py (additional data validation functions)
 
 Any changes to models to remain explicit and include help_text.
 
@@ -34,7 +34,7 @@ Any changes to models to remain explicit and include help_text.
 
 
 class RacingCommon(models.Model):
-    """Abstract class for common time fields"""
+    """Abstract class for common time fields used in all other model classes"""
 
     created = models.DateTimeField(
         auto_now_add=True, null=True

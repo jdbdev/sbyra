@@ -12,6 +12,8 @@ commands.txt
 commands.md
 sketches/
 sketches
+unleash_demo_dev.py
+admin_fixtures.json
 
 
 # C extensions
