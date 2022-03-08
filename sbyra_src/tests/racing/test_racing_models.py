@@ -1,7 +1,9 @@
+import datetime
+
 import pytest
 from django.db import IntegrityError
 from django.utils.text import slugify
-from sbyra_src.racing.models import Yacht
+from sbyra_src.racing.models import Event, Result, Series, Yacht
 
 """ 
 Specifications: 
@@ -21,9 +23,13 @@ yacht_data = [
     (3, "Yacht3", "B"),
 ]
 
-event_data = []
+event_data = [()]
 
-series_data = []
+series_test_data = [
+    (1, "Series_1", 2021),
+    (2, "Series_2", 2022),
+    (3, "Series_3", 2022),
+]
 
 result_data = []
 
@@ -31,8 +37,11 @@ result_data = []
 @pytest.mark.django_db
 def test_load_fixture(load_db_fixtures):
     """Test that fixtures are loading. Only tests if at least one has been loaded."""
-    data = Yacht.objects.all()
-    assert len(data) >= 1
+    Yacht_data = Yacht.objects.all()
+    Series_data = Series.objects.all()
+
+    assert len(Yacht_data) >= 1
+    assert len(Series_data) >= 1
 
 
 # ------------------- MODEL: YACHT ------------------- #
@@ -75,10 +84,9 @@ def test_is_active_signal():
     assert yacht1.is_active == True
 
 
-@pytest.mark.django_db()
-# @pytest.mark.xfail
+@pytest.mark.django_db
 def test_name_unique():
-
+    """test unique integrity of Yacht.name field"""
     with pytest.raises(IntegrityError):
         new_yacht1 = Yacht.objects.create(name="NewYacht1")
         new_yacht1.save()
@@ -87,6 +95,57 @@ def test_name_unique():
 
 
 # ------------------- MODEL: SERIES ------------------- #
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize("id, name, year", series_test_data)
+class TestSeriesModel:
+    def test_series_data(self, id, name, year):
+        """Test basic data entry into the model fields"""
+        series_data = Series.objects.get(id=id)
+        assert series_data.id == id
+        assert series_data.name == name
+        assert series_data.year == year
+
+    def test_year_data_type(self, id, name, year):
+        """test that the year is entered as an integer"""
+        series_data = Series.objects.get(id=id)
+        assert type(series_data.year) == type(1)
+        print(type(series_data.year))
+
+    def test_current_year(self, id, name, year):
+        pass
+
+
+@pytest.mark.django_db
+def test_default_manager():
+    """test custom manager and additional methods on Series object managers"""
+    s1 = Series.objects.all()  # test class DefaultSeriesManager
+    assert len(s1) == 3
+    s2 = Series.objects.by_year(
+        2021
+    )  # test class DefaultSeriesManager method: by_year(x)
+    assert len(s2) == 1
+
+
+@pytest.mark.django_db
+def test_current_year_manager():
+    """test custom manager that returns a filter queryset"""
+    pass
+
+
+@pytest.mark.django_db
+def test_name_unique():
+    """test unique integrity of Series.name field"""
+    with pytest.raises(IntegrityError):
+        new_series_1 = Series.objects.create(
+            name="new_series_1", year=2022
+        )
+        new_series_1.save()
+        new_series_2 = Series.objects.create(
+            name="new_series_1", year=2022
+        )
+        new_series_2.save()
 
 
 # ------------------- MODEL: EVENT -------------------- #

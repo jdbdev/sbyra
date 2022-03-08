@@ -17,7 +17,5 @@ def load_db_fixtures(
     """load DB data fixture"""
     with django_db_blocker.unblock():
         call_command("loaddata", "yacht_fixtures.json")
-        call_command("loaddata", "yachtclub_fixtures.json")
         call_command("loaddata", "series_fixtures.json")
         call_command("loaddata", "event_fixtures.json")
-        call_command("loaddata", "result_fixtures.json")

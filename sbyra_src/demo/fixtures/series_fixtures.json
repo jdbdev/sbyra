@@ -3,15 +3,15 @@
         "model": "racing.series",
         "pk": 1,
         "fields": {
-            "name": "series1",
-            "year": 2022
+            "name": "Series_1",
+            "year": 2021
         }
     },
     {
         "model": "racing.series",
         "pk": 2,
         "fields": {
-            "name": "series2",
+            "name": "Series_2",
             "year": 2022
         }
     },
@@ -19,8 +19,8 @@
         "model": "racing.series",
         "pk": 3,
         "fields": {
-            "name": "series3",
-            "year": 2021
+            "name": "Series_3",
+            "year": 2022
         }
     }
 ]
