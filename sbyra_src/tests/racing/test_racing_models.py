@@ -138,6 +138,7 @@ def test_current_year_manager():
 def test_name_unique():
     """test unique integrity of Series.name field"""
     with pytest.raises(IntegrityError):
+
         new_series_1 = Series.objects.create(
             name="new_series_1", year=2022
         )

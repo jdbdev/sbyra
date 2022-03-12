@@ -259,7 +259,7 @@ class Result(RacingCommon):
 
         """
 
-        def convert_to_seconds(time_obj):
+        def convert_to_seconds(time_obj) -> int:
             """Function takes a datetime.time object and converts into seconds"""
             seconds = (
                 (time_obj.hour * 3600)
