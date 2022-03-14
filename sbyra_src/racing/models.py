@@ -2,6 +2,7 @@ import datetime
 
 from django.conf import settings
 from django.db import models
+from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from sbyra_src.racing.choices import (
     CompletionStatusChoice,
@@ -118,6 +119,9 @@ class Yacht(RacingCommon):
     def __str__(self):
         return self.name
 
+    def get_absolute_url(self):
+        pass
+
 
 class Series(RacingCommon):
     """Series class describing all attributes of a series and linking sets of events"""
@@ -199,7 +203,7 @@ class Result(RacingCommon):
     completed_status = models.CharField(
         max_length=3,
         choices=CompletionStatusChoice.choices,
-        default="CMP",
+        default=CompletionStatusChoice.CMP,
         help_text=_("race completion status"),
     )
     finish_time = models.TimeField(
@@ -228,7 +232,11 @@ class Result(RacingCommon):
 
     @property
     def yacht_class_start(self):
-        """Returns racing class start time for a specific yacht in a specific event based on yacht racing class"""
+        """
+        Returns racing class start time for a specific yacht in a specific event based on yacht racing class.
+        Called by calc_corrected_time property/method.
+
+        """
         yacht_class = self.yacht.yacht_class
         if yacht_class == "A" or "A1":
             class_start = self.event.start_A
@@ -246,7 +254,7 @@ class Result(RacingCommon):
         Returns the yacht's corrected time based on its elapsed time and time correction factor, and applies any penalties.
         Returns result only for active yachts that have completed the event. Returns None for all other yachts.
 
-        sbyra time correction factor used: 650/(520 + phrf_rating)
+        *sbyra time correction factor used: 650/(520 + phrf_rating)*
 
         Corrected Time Algorithm:
 
@@ -257,10 +265,12 @@ class Result(RacingCommon):
         5. Convert corrected time above (seconds) into datetime.time object for model TimeField()
         6. Save final datetime.time object into Result.posted_time
 
+        Method called by save() to enter corrected time in posted_time field
+
         """
 
         def convert_to_seconds(time_obj) -> int:
-            """Function takes a datetime.time object and converts into seconds"""
+            """Function takes a datetime.time object, converts into seconds and returns an Int type"""
             seconds = (
                 (time_obj.hour * 3600)
                 + (time_obj.minute * 60)
@@ -288,17 +298,7 @@ class Result(RacingCommon):
         finish_time = self.finish_time
         penalty = self.time_penalty
 
-        # Establish start time based on yacht's class and event class start:
         if active_status and completed:
-
-            # if yacht_class == "A" or "A1":
-            #     start_time = self.event.start_A
-            # elif yacht_class == "B":
-            #     start_time = self.event.start_B
-            # elif yacht_class == "C":
-            #     start_time = self.event.start_C
-            # elif yacht_class == "J":
-            #     start_time = self.event.start_J
 
             # Convert all times to seconds:
             start = convert_to_seconds(start_time)
