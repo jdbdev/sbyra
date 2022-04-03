@@ -38,11 +38,10 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     # Project Core Applications:
-    "sbyra_src.racing",
-    "sbyra_src.weather",
-    "sbyra_src.content",
-    # Demo Applications:
-    "sbyra_src.demo",
+    "sbyra_src.racing",  # all racing activities
+    "sbyra_src.weather",  # Context processor connects to openweather.org api
+    "sbyra_src.content",  # content, blog, news, articles, etc.
+    "sbyra_src.demo",  # demo runs all fixtures
 ]
 
 MIDDLEWARE = [
