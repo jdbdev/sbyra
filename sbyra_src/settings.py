@@ -37,9 +37,11 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    # Project Applications:
+    # Project Core Applications:
     "sbyra_src.racing",
     "sbyra_src.weather",
+    "sbyra_src.content",
+    # Demo Applications:
     "sbyra_src.demo",
 ]
 
