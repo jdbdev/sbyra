@@ -18,9 +18,9 @@ Specifications:
 yachtclub_data = []
 
 yacht_data = [
-    (1, "Yacht1", "A"),
-    (2, "Yacht2", "A1"),
-    (3, "Yacht3", "B"),
+    (1, "Yacht1", "A", "2022-02-02 22:02:02"),
+    (2, "Yacht2", "A1", "2022-02-02 22:02:02"),
+    (3, "Yacht3", "B", "2022-02-02 22:02:02"),
 ]
 
 event_data = [()]
@@ -48,9 +48,9 @@ def test_load_fixture(load_db_fixtures):
 
 
 @pytest.mark.django_db
-@pytest.mark.parametrize("id, name, yacht_class", yacht_data)
+@pytest.mark.parametrize("id, name, yacht_class, created", yacht_data)
 class TestYachtModel:
-    def test_yacht_data(self, id, name, yacht_class):
+    def test_yacht_data(self, id, name, yacht_class, created):
         """Test basic data entry into the model fields"""
         yacht = Yacht.objects.get(id=id)
         assert yacht.id == id
@@ -58,6 +58,9 @@ class TestYachtModel:
         assert yacht.phrf_rating == None
         assert yacht.yacht_class == yacht_class
         assert yacht.is_active == False
+        assert (
+            yacht.created.strftime("%Y-%m-%d %H:%M:%S") == created
+        )  # format the data from the database to match parameters
 
 
 @pytest.mark.django_db

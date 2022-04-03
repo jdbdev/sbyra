@@ -4,7 +4,8 @@
         "pk": 1,
         "fields": {
             "name": "Yacht1",
-            "yacht_class": "A"
+            "yacht_class": "A",
+            "created": "2022-02-02 22:02:02"
         }
     },
     {
@@ -12,7 +13,8 @@
         "pk": 2,
         "fields": {
             "name": "Yacht2",
-            "yacht_class": "A1"
+            "yacht_class": "A1",
+            "created": "2022-02-02 22:02:02"
         }
     },
     {
@@ -20,7 +22,8 @@
         "pk": 3,
         "fields": {
             "name": "Yacht3",
-            "yacht_class": "B"
+            "yacht_class": "B",
+            "created": "2022-02-02 22:02:02"
         }
     }
 ]
