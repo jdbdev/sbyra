@@ -290,7 +290,7 @@ class Result(RacingCommon):
         else:
             completed = False
 
-        # Establish all required variables:
+        # Establish all inputs:
         active_status = self.yacht.is_active
         phrf_rating = self.yacht.phrf_rating
         time_correction_factor = 650 / (520 + phrf_rating)

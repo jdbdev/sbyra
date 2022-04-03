@@ -1,7 +1,3 @@
-<style>
-blue { color: #0277bd }
-</style>
-
 # Shediac Bay Yacht Racing Association (SBYRA)
 
 *SBYRA is a single user group application as part of a larger application in development (WINCH) for yacht and regatta management*
