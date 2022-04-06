@@ -73,13 +73,21 @@ class Yacht(RacingCommon):
         blank=False,
         null=True,
         unique=True,
-        help_text=_("enter yacht name"),
+        help_text=_("yacht name"),
     )
     slug = models.SlugField(
         blank=True,
         null=True,
         help_text=_("web safe url"),
         verbose_name="Web safe URL",
+    )
+    skipper = models.ForeignKey(
+        User,
+        blank=True,
+        null=True,
+        on_delete=models.CASCADE,
+        help_text=_("yacht skipper"),
+        verbose_name="skipper",
     )
     sail_num = models.CharField(
         max_length=25,
@@ -192,7 +200,7 @@ class Event(RacingCommon):
         verbose_name_plural = "events"
 
     def __str__(self):
-        return str(self.name)
+        return str(self.event_date)
 
 
 class Result(RacingCommon):

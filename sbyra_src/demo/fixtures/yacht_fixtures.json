@@ -3,6 +3,7 @@
         "model": "racing.yacht",
         "pk": 1,
         "fields": {
+            "skipper": 1,
             "name": "Yacht1",
             "yacht_class": "A",
             "created": "2022-02-02 22:02:02"
@@ -12,6 +13,7 @@
         "model": "racing.yacht",
         "pk": 2,
         "fields": {
+            "skipper": 2,
             "name": "Yacht2",
             "yacht_class": "A1",
             "created": "2022-02-02 22:02:02"
@@ -21,6 +23,7 @@
         "model": "racing.yacht",
         "pk": 3,
         "fields": {
+            "skipper": 3,
             "name": "Yacht3",
             "yacht_class": "B",
             "created": "2022-02-02 22:02:02"

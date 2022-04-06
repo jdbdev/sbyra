@@ -32,7 +32,9 @@ def weather_api(request):
 
         if key in r["wind"]:
             wind_speed = float(r["wind"][key]) * conversion
-        return round(wind_speed, 2)
+            return round(wind_speed, 2)
+        else:
+            return wind_speed
 
     def wind_direction():
         """verifies that api returns a value, and provides the verbose direction from degrees"""

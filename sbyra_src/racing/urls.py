@@ -3,8 +3,12 @@ from django.urls import include, path
 
 from . import views
 
-# app_name = "racing"
+"""Racing URL Configurations - includes all pages related to yacht racing"""
 
-# urlpatterns = [
-#     path("/", views.home, name="racing_home"),
-# ]
+
+app_name = "racing"
+
+urlpatterns = [
+    path("", views.racing_home, name="racing_home"),
+    path("yachts/", views.list_yachts, name="list_yachts"),
+]

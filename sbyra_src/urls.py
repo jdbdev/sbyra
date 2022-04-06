@@ -5,5 +5,10 @@ from django.urls import include, path
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("", include("sbyra_src.content.urls")),
+    path(
+        "", include("sbyra_src.content.urls")
+    ),  # links to blog and all base content
+    path(
+        "racing/", include("sbyra_src.racing.urls")
+    ),  # links to all racing related content
 ]

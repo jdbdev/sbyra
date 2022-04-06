@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <h3>Welcome to Racing Home</h3>
+    <hr>
+    <table>
+        <thead>
+            <tr>
+                <th>Yacht ID</th>
+                <th>Yacht Name</th>
+                <th>Yacht Class</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for yacht in yachts %}
+            <tr>
+                <td>{{yacht.id}}</td>
+                <td>{{yacht.name}}</td>
+                <td>{{yacht.yacht_class}}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <hr>
+    {{events}}
+    <hr>
+    {{series}}
+</body>
+
+</html>

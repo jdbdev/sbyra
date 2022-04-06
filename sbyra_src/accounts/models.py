@@ -31,32 +31,32 @@ Members of the pulic and potential race members can create a User account.
 #         )
 
 
-class User(AbstractBaseUser, PermissionsMixin):
-    """Custom User model replaces default User model"""
+# class User(AbstractBaseUser, PermissionsMixin):
+#     """Custom User model replaces default User model"""
 
-    email = models.EmailField(
-        max_length=255, help_text=_("email address"), unique=True
-    )
-    username = models.CharField(
-        max_length=255, help_text=_("your username"), unique=True
-    )
-    created = models.DateTimeField(auto_now_add=True)
-    modified = models.DateTimeField(auto_now=True)
-    is_skipper = models.BooleanField(
-        default=False, help_text=_("are you a skipper?")
-    )
+#     email = models.EmailField(
+#         max_length=255, help_text=_("email address"), unique=True
+#     )
+#     username = models.CharField(
+#         max_length=255, help_text=_("your username"), unique=True
+#     )
+#     created = models.DateTimeField(auto_now_add=True)
+#     modified = models.DateTimeField(auto_now=True)
+#     is_skipper = models.BooleanField(
+#         default=False, help_text=_("are you a skipper?")
+#     )
 
-    is_active = models.BooleanField(default=True)
-    is_staff = models.BooleanField(default=False)
-    is_admin = models.BooleanField(default=False)
+#     is_active = models.BooleanField(default=True)
+#     is_staff = models.BooleanField(default=False)
+#     is_admin = models.BooleanField(default=False)
 
-    USERNAME_FIELD = "email"
-    REQUIRED_FIELDS = [
-        "username",
-    ]
+#     USERNAME_FIELD = "email"
+#     REQUIRED_FIELDS = [
+#         "username",
+#     ]
 
-    def __str__(self):
-        return self.username
+#     def __str__(self):
+#         return self.username
 
 
 # class SkipperProfile(models.Model):

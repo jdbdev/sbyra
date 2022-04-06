@@ -30,13 +30,15 @@ Julien Boudreau - Creator, Lead Developer, Lead UI and UX Design.
 ## 5.Project Structure:
 
 sbyra_src
-  - accounts (App)
+  - accounts (App - User profiles and authentication)
+  - content (App - blog, articles, static web content)
   - demo (run demo from cmd line)
-  - racing (App)
+  - racing (App - all racing related functionality)
   - weather (App - openweathermap.org api call)
   - tests (pytest testing suite)
   - settings.py
   - urls.py
+- manage.py
 
 
 manage.py
