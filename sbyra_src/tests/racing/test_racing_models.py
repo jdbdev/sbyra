@@ -60,7 +60,7 @@ class TestYachtModel:
         assert yacht.is_active == False
         assert (
             yacht.created.strftime("%Y-%m-%d %H:%M:%S") == created
-        )  # format the data from the database to match parameters
+        )  # format the data returned from the database to match parameters with strftime("%Y-%m-%d %H:%M:%S")
 
 
 @pytest.mark.django_db

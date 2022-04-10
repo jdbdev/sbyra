@@ -19,21 +19,21 @@ def racing_home(request):
 def list_yachts(request):
     """View lists all yacht profiles"""
 
-    yachts = Yacht.objects.all()
-    yachts_active = Yacht.active.all()
+    all_yachts = Yacht.objects.all()
+    active_yachts = Yacht.active.all()
 
     template = "racing/list_yachts.html"
     context = {
-        "yachts": yachts,
-        "yachts_active": yachts_active,
+        "all_yachts": all_yachts,
+        "active_yachts": active_yachts,
     }
 
     return render(request, template, context)
 
 
-def yacht_details(request, pk):
+def yacht_details(request, slug):
     "View shows yacht details using Yacht.slug"
-    yacht = Yacht.objects.get(pk=pk)
+    yacht = Yacht.objects.get(slug=slug)
     template = "racing/yacht_details.html"
     context = {"yacht": yacht}
     return render(request, template, context)

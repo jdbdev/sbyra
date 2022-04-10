@@ -31,6 +31,7 @@ Julien Boudreau - Creator, Lead Developer, Lead UI and UX Design.
 
 sbyra_src
   - accounts (App - User profiles and authentication)
+  - api (Django Rest Framework API)
   - content (App - blog, articles, static web content)
   - demo (run demo from cmd line)
   - racing (App - all racing related functionality)
@@ -47,6 +48,7 @@ sbyra_src
 ## How it all Works - The Racing Model Schema:
 
 Regular User: A user can create a yacht and register for various Regatta series and events. 
+Admin or Staff user: A user can create instances of all models, including add results.
 
 Admin User: An Admin User can create Series to hold a set of regattas or racing events (yearly, monthly, weekly, etc.). Once a Series is created, various events can be added, modified and evaluated. The Event has a ForeignKey relationship to the Series. Yacht and Event have a Many to Many relationship linked by a through table Result. The Result table contains individual yacht results for various events. 
 
