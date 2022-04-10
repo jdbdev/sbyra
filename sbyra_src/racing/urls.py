@@ -9,6 +9,10 @@ from . import views
 app_name = "racing"
 
 urlpatterns = [
-    path("", views.racing_home, name="racing_home"),
-    path("yachts/", views.list_yachts, name="list_yachts"),
+    path("", views.racing_home, name="racing-home"),
+    path("yachts/", views.list_yachts, name="list-yachts"),
+    # <datatype:data>
+    path(
+        "yachts/<slug:slug>", views.yacht_details, name="yacht-details"
+    ),
 ]

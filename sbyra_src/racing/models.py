@@ -86,6 +86,7 @@ class Yacht(RacingCommon):
         blank=True,
         null=True,
         on_delete=models.CASCADE,
+        related_name="yachts",  # user.yachts.all()
         help_text=_("yacht skipper"),
         verbose_name="skipper",
     )
@@ -128,7 +129,10 @@ class Yacht(RacingCommon):
         return self.name
 
     def get_absolute_url(self):
-        pass
+        # return f"/yachts/{self.slug}/"
+        # pass to yacht-details url the keyword arguments - slug
+        slug = self.slug
+        return reverse("yacht-details", kwargs={"slug": slug})
 
 
 class Series(RacingCommon):

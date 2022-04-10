@@ -38,10 +38,11 @@ sbyra_src
   - tests (pytest testing suite)
   - settings.py
   - urls.py
-- manage.py
+
+#### templates (all HTML templates)
+#### manage.py 
 
 
-manage.py
 
 ## How it all Works - The Racing Model Schema:
 

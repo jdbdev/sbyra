@@ -2,7 +2,7 @@ from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 from django.utils.text import slugify
 
-from .models import Yacht
+from .models import Yacht, YachtClub
 
 # --------------------- MODEL: Yacht --------------------- #
 
@@ -24,4 +24,13 @@ def yacht_is_active(sender, instance, *args, **kwargs):
             instance.is_active = True
 
 
-# ------------------- MODEL: Series ------------------- #
+# ------------------- MODEL: YachtClub ------------------- #
+
+
+@receiver(pre_save, sender=YachtClub)
+def slug_pre_save(sender, instance, *args, **kwargs):
+    """signal sets slug to match name as a web safe url"""
+    name = instance.name
+    slug = instance.slug
+    if slug is None:
+        instance.slug = slugify(name)
