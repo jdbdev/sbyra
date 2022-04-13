@@ -10,9 +10,10 @@
 
 ## 2.Future additions:
 
-- Local chat feature
-- Local buy & sell feature
-- result visualisation 
+- Django Sessions
+- Local chat feature (async chat)
+- Local buy & sell feature (forum)
+- result visualisation (charts)
 
 ## 3.Tech stack
 
@@ -44,11 +45,9 @@ sbyra_src
 #### manage.py 
 
 
-
 ## How it all Works - The Racing Model Schema:
 
 Regular User: A user can create a yacht and register for various Regatta series and events. 
-Admin or Staff user: A user can create instances of all models, including add results.
 
 Admin User: An Admin User can create Series to hold a set of regattas or racing events (yearly, monthly, weekly, etc.). Once a Series is created, various events can be added, modified and evaluated. The Event has a ForeignKey relationship to the Series. Yacht and Event have a Many to Many relationship linked by a through table Result. The Result table contains individual yacht results for various events. 
 

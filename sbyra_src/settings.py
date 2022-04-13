@@ -31,17 +31,18 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    # Base Django APPS
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    # Project Core Applications:
-    "sbyra_src.racing",  # all racing activities
+    # Project APPS:
+    "sbyra_src.racing",  # all yacht racing activities and records
     "sbyra_src.weather",  # Context processor connects to openweather.org api
-    "sbyra_src.content",  # content, blog, news, articles, etc.
-    "sbyra_src.demo",  # demo runs all fixtures
+    "sbyra_src.content",  # static content, blog, news, articles, etc.
+    "sbyra_src.demo",  # installs all fixtures for live demo
 ]
 
 MIDDLEWARE = [
