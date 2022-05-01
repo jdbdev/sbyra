@@ -13,10 +13,8 @@
     <hr>
     <form action="{% url 'racing:yacht-register' %}" method="POST">
         {% csrf_token %}
-        {% for form in formset %}
         {{ form.as_p }}
         <hr>
-        {% endfor %}
         <input type="submit" value="submit">
     </form>
 </body>

@@ -15,35 +15,39 @@ environ.Env.read_env()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = env("SECRET_KEY", default="unsafe-secret-key")
 
-# SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
 ALLOWED_HOSTS = []
 
 
-# Application definition
+# APPLICATIONS
 
-INSTALLED_APPS = [
-    # Base Django APPS
+DJANGO_CORE_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    # Project APPS:
+]
+THIRD_PARTY_APPS = [
+    # django-allauth:
+    "django.contrib.sites",
+    "allauth",
+    "allauth.account",
+    "allauth.socialaccount",
+]
+PROJECT_APPS = [
     "sbyra_src.racing",  # all yacht racing activities and records
     "sbyra_src.weather",  # Context processor connects to openweather.org api
     "sbyra_src.content",  # static content, blog, news, articles, etc.
     "sbyra_src.demo",  # installs all fixtures for live demo
+    "sbyra_src.accounts",  # Custom User model and user profile
 ]
+
+INSTALLED_APPS = DJANGO_CORE_APPS + THIRD_PARTY_APPS + PROJECT_APPS
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -78,7 +82,6 @@ WSGI_APPLICATION = "sbyra_src.wsgi.application"
 
 
 # Database
-# https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
 DATABASES = {
     "default": {

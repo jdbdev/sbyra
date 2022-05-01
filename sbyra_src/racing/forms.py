@@ -7,9 +7,12 @@ from .models import Event, Result, Series, Yacht, YachtClub
 class YachtForm(ModelForm):
     """Form to register a new yacht"""
 
-    class meta:
+    class Meta:
+        model = YachtClub
+        fields = "__all__"
+
+    class Meta:
         model = Yacht
-        # fields ="__all__"
         fields = (
             "name",
             "skipper",
@@ -33,21 +36,21 @@ class YachtForm(ModelForm):
 #     )
 
 
-class YachtClubForm(ModelForm):
-    class meta:
-        model = YachtClub
+# class YachtClubForm(ModelForm):
+#     class Meta:
+#         model = YachtClub
 
 
-class Series(ModelForm):
-    class meta:
-        model = Series
+# class Series(ModelForm):
+#     class Meta:
+#         model = Series
 
 
-class Event(ModelForm):
-    class meta:
-        model = Event
+# class Event(ModelForm):
+#     class Meta:
+#         model = Event
 
 
-class Result(ModelForm):
-    class meta:
-        model = Result
+# class Result(ModelForm):
+#     class Meta:
+#         model = Result
