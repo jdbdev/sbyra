@@ -4,11 +4,8 @@ from django.urls import include, path
 """sbyra_src URL Configurations"""
 
 urlpatterns = [
+    path("", include("sbyra_src.content.urls")),
     path("admin/", admin.site.urls),
-    path(
-        "", include("sbyra_src.content.urls")
-    ),  # links to static pages and all base content, including Articles, News, Upcoming Events, etc.
-    path(
-        "racing/", include("sbyra_src.racing.urls")
-    ),  # links to all racing related content, including Yachts, Events, Results, etc.
+    path("accounts/", include("allauth.urls")),
+    path("racing/", include("sbyra_src.racing.urls")),
 ]

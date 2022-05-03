@@ -31,20 +31,21 @@ DJANGO_CORE_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django.contrib.sites",  # required for django-allauth
 ]
 THIRD_PARTY_APPS = [
     # django-allauth:
-    "django.contrib.sites",
     "allauth",
     "allauth.account",
     "allauth.socialaccount",
 ]
+
 PROJECT_APPS = [
     "sbyra_src.racing",  # all yacht racing activities and records
     "sbyra_src.weather",  # Context processor connects to openweather.org api
     "sbyra_src.content",  # static content, blog, news, articles, etc.
     "sbyra_src.demo",  # installs all fixtures for live demo
-    "sbyra_src.accounts",  # Custom User model and user profile
+    "sbyra_src.accounts",  # Custom User model and User profile
 ]
 
 INSTALLED_APPS = DJANGO_CORE_APPS + THIRD_PARTY_APPS + PROJECT_APPS
@@ -109,6 +110,25 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+### -------------------- ALLAUTH SETTINGS -------------------- ###
+
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+
+AUTHENTICATION_BACKENDS = (
+    # Needed to login by username in Django admin, regardless of `allauth`
+    "django.contrib.auth.backends.ModelBackend",
+    # `allauth` specific authentication methods, such as login by e-mail
+    "allauth.account.auth_backends.AuthenticationBackend",
+)
+
+SITE_ID = 1
+
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_USERNAME_REQUIRED = False
+ACCOUNT_SIGNUP_PASSWORD_ENTER_TWICE = False
+ACCOUNT_SESSION_REMEMBER = True
+ACCOUNT_AUTHENTICATION_METHOD = "email"
+ACCOUNT_UNIQUE_EMAIL = True
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.0/topics/i18n/
@@ -131,3 +151,8 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+AUTH_USER_MODEL = "accounts.CustomUser"
+
+LOGIN_REDIRECT_URL = "#"
+LOGOUT_REDIRECT_URL = "#"
