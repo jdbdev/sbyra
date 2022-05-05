@@ -1,4 +1,8 @@
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
+from django.contrib.auth.models import (
+    AbstractBaseUser,
+    BaseUserManager,
+    PermissionsMixin,
+)
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -8,14 +12,9 @@ Custom User model implementation using django-allauth for email authentication. 
 in the admin panel with email to match django-allauth authentication. Once User is created, profile is automatically
 generated via signal. 
 
-1. Override User model provided by django.contrib.auth
-2. Create Custom UserManager that inherits from BaseUserManager
-3. Define methods User and Superuser creating methods (include fields in Custom User model)
-4. Create Custom User model that inherits from AbstractBaseUser
-5. Add fields required by application
-6. Modify UserCreationForm and UserChangeForm to match User model fields
-
-Default fields for AbstractBaseUser: ID, password, last_login
+- Default fields for AbstractBaseUser: ID, password, last_login
+- Default fields for PermissionsMixin: is_superuser
+- Additional fields for Custom User model: first_name, last_name, email, date_joined, is_staff
 
 """
 
@@ -52,7 +51,7 @@ class UserManager(BaseUserManager):
         return self._create_user(email, password, **extra_fields)
 
 
-class User(AbstractBaseUser):
+class User(AbstractBaseUser, PermissionsMixin):
     """Custom user model that uses email for authentication"""
 
     email = models.EmailField(
