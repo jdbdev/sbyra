@@ -83,8 +83,12 @@ class Profile(models.Model):
     is_skipper = models.BooleanField(_("skipper status"), default=False)
     city = models.CharField(_("city/town"), max_length=100)
     province = models.CharField(_("province"), max_length=100)
-    street_name = models.CharField(_("street name"), max_length=100)
-    street_number = models.IntegerField(_("street number"))
+    street_name = models.CharField(
+        _("street name"), max_length=100, blank=True
+    )
+    street_number = models.IntegerField(
+        _("street number"), blank=True, null=True
+    )
     postal_code = models.CharField(
         _("postal code"),
         max_length=7,

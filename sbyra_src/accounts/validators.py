@@ -18,7 +18,7 @@ Regex pattern for Canadian Postal Code:
 
 
 def validate_postal_code(postal_code):
-    """Validation for Canadian and American postal/zip codes. Valid String must be length of 5 to 6."""
+    """Validation for Canadian and American postal/zip codes. Valid String must be length of 5 or 6."""
 
     clean_postal_code = postal_code.replace(" ", "")
     upper_postal = clean_postal_code.upper()
