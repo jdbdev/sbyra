@@ -1,16 +1,20 @@
 from django.contrib.auth.models import (
     AbstractBaseUser,
-    BaseUserManager,
     PermissionsMixin,
 )
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
+from sbyra_src.accounts.managers import UserManager
+
+from .validators import validate_postal_code
 
 """
 Custom User model implementation using django-allauth for email authentication. AbstractBaseUser allows Users to be created
 in the admin panel with email to match django-allauth authentication. Once User is created, profile is automatically
 generated via signal. 
+
+Adjust forms and related classes to include:
 
 - Default fields for AbstractBaseUser: ID, password, last_login
 - Default fields for PermissionsMixin: is_superuser
@@ -19,44 +23,12 @@ generated via signal.
 """
 
 
-class UserManager(BaseUserManager):
-    """Custom object manager for User model"""
-
-    def _create_user(self, email, password=None, **extra_fields):
-        """Higher level function called by create_user(), create_staff() and create_superuser()"""
-        if not email:
-            raise ValueError("Members must have an email address")
-        email = self.normalize_email(email)
-        user = self.model(email=email, **extra_fields)
-        user.set_password(password)
-        user.save(using=self._db)
-        return User
-
-    def create_user(self, email, password=None, **extra_fields):
-        extra_fields.setdefault("is_superuser", False)
-        extra_fields.setdefault("is_staff", False)
-        return self._create_user(email, password, **extra_fields)
-
-    def create_staffuser(self, email, password=None, **extra_fields):
-        extra_fields.setdefault("is_staff", True)
-        if extra_fields.get("is_saff") is not True:
-            raise ValueError("Staff status must be set to True")
-        return self._create_user(email, password, **extra_fields)
-
-    def create_superuser(self, email, password=None, **extra_fields):
-        extra_fields.setdefault("is_superuser", True)
-        extra_fields.setdefault("is_staff", True)
-        if extra_fields.get("is_superuser") is not True:
-            raise ValueError("Superuser status must be set to True")
-        return self._create_user(email, password, **extra_fields)
-
-
 class User(AbstractBaseUser, PermissionsMixin):
     """Custom user model that uses email for authentication"""
 
     email = models.EmailField(
         _("email address"),
-        max_length=60,
+        max_length=75,
         unique=True,
         blank=False,
         null=False,
@@ -74,7 +46,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     )
     is_active = models.BooleanField(
         _("active status"),
-        default=True,
+        default=False,
         help_text="Toggles active status. Deselect instead of deleting account",
     )
     date_joined = models.DateTimeField(
@@ -87,8 +59,8 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = [
-        # "first_name",
-        # "last_name",
+        "first_name",
+        "last_name",
     ]
 
     class Meta:
@@ -104,11 +76,17 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 
 class Profile(models.Model):
-    """User Profile associated with User model instance via OneToOne relationship"""
+    """User Profile associated with User model instance via OneToOne relationship. Admin purposes only, no public profile page"""
 
     user = models.OneToOneField(User, on_delete=models.CASCADE)
+    slug = models.SlugField()
     is_skipper = models.BooleanField(_("skipper status"), default=False)
     city = models.CharField(_("city/town"), max_length=100)
     province = models.CharField(_("province"), max_length=100)
     street_name = models.CharField(_("street name"), max_length=100)
     street_number = models.IntegerField(_("street number"))
+    postal_code = models.CharField(
+        _("postal code"),
+        max_length=7,
+        validators=[validate_postal_code],
+    )  # create custom validator for postal codes!
