@@ -15,7 +15,7 @@ class UserManager(BaseUserManager):
     ):
         """
         Higher level function called by create_user(), create_staff() and create_superuser().
-        Provides validation for required fields; email, first_name, last_name
+        Provides base validation for required fields; email, first_name, last_name
         """
         if not email:
             raise ValueError(_("Members must have an email address"))
@@ -52,12 +52,7 @@ class UserManager(BaseUserManager):
         )
 
     def create_staffuser(
-        self,
-        email,
-        first_name,
-        last_name,
-        password=None,
-        **extra_fields
+        self, email, first_name, last_name, password, **extra_fields
     ):
         extra_fields.setdefault("is_staff", True)
         if extra_fields.get("is_saff") is not True:
@@ -67,12 +62,7 @@ class UserManager(BaseUserManager):
         )
 
     def create_superuser(
-        self,
-        email,
-        first_name,
-        last_name,
-        password=None,
-        **extra_fields
+        self, email, first_name, last_name, password, **extra_fields
     ):
         extra_fields.setdefault("is_superuser", True)
         extra_fields.setdefault("is_staff", True)

@@ -32,6 +32,9 @@ def validate_postal_code(postal_code):
         postal_regex = re.compile(
             r"[ABCEGHJKLMNPRSTVXY][0-9][ABCEGHJKLMNPRSTVWXYZ][0-9][ABCEGHJKLMNPRSTVWXYZ][0-9]"
         )
+        if re.match(postal_regex, upper_postal) is not True:
+            raise ValidationError("Invalid postal or zip code")
+
     # regex pattern match for American ZIP codes:
     elif postal_length == 5:
         zip_regex = re.compile(r"[]")

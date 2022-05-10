@@ -66,20 +66,20 @@ class User(AbstractBaseUser, PermissionsMixin):
     class Meta:
         verbose_name = _("user")
         verbose_name_plural = _("users")
+        ordering = ["last_name"]
 
     def get_full_name(self):
         full_name = (f"{self.first_name} {self.last_name}").strip()
         return full_name
 
     def __str__(self):
-        return self.email
+        return f"{self.first_name} {self.last_name}"
 
 
 class Profile(models.Model):
     """User Profile associated with User model instance via OneToOne relationship. Admin purposes only, no public profile page"""
 
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    slug = models.SlugField()
     is_skipper = models.BooleanField(_("skipper status"), default=False)
     city = models.CharField(_("city/town"), max_length=100)
     province = models.CharField(_("province"), max_length=100)
@@ -93,4 +93,8 @@ class Profile(models.Model):
         _("postal code"),
         max_length=7,
         validators=[validate_postal_code],
-    )  # create custom validator for postal codes!
+    )  # create custom validator for postal codes - in progress!
+
+    class Meta:
+        verbose_name = _("profile")
+        verbose_name_plural = _("profiles")
