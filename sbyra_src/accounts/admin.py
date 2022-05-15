@@ -11,9 +11,7 @@ class UserAdmin(BaseUserAdmin):
     add_form = CustomUserCreationForm
     form = CustomUserChangeForm
     model = User
-    search_fields = [
-        "email, first_name",
-    ]
+    search_fields = ["email, first_name", "last_name"]
     list_display = ["email", "first_name", "last_name", "is_staff"]
     fieldsets = (
         (
