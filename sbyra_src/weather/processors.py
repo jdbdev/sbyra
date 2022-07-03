@@ -21,9 +21,8 @@ def weather_api(request):
     city = "Shediac"
     r = requests.get(url.format(city, api_key)).json()
 
-    conversion = float(
-        1.9438444924
-    )  # conversion factor for meters/sec to knots
+    # conversion factor for meters/sec to knots
+    conversion = float(1.9438444924)
 
     def wind_speed():
         """verifies that api returns a value and converts value from m/s to knots"""
