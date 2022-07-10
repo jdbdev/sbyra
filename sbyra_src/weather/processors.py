@@ -25,7 +25,7 @@ def weather_api(request):
     conversion = float(1.9438444924)
 
     def wind_speed():
-        """verifies that api returns a value and converts value from m/s to knots"""
+        """verifies that api returns a key:value and converts wind value from m/s to knots"""
         key = "speed"
         wind_speed = "unknown"
 
