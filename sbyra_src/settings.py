@@ -38,6 +38,10 @@ THIRD_PARTY_APPS = [
     "allauth",
     "allauth.account",
     "allauth.socialaccount",
+    # django REST framework:
+    "rest_framework",
+    # Various apps:
+    "django_countries",
 ]
 
 PROJECT_APPS = [

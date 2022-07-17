@@ -184,7 +184,7 @@ class Event(RacingCommon):
     event_date = models.DateField(blank=True)
     series = models.ForeignKey(
         Series, related_name="events", on_delete=models.CASCADE
-    )
+    )  # Series.events.all()
     first_flag_A = models.TimeField(blank=True, null=True)
     first_flag_B = models.TimeField(blank=True, null=True)
     first_flag_C = models.TimeField(blank=True, null=True)

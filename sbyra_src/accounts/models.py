@@ -5,6 +5,7 @@ from django.contrib.auth.models import (
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
+from django_countries.fields import CountryField
 from sbyra_src.accounts.managers import UserManager
 
 from .validators import validate_postal_code
@@ -24,7 +25,7 @@ Adjust forms and related classes to include:
 
 
 class User(AbstractBaseUser, PermissionsMixin):
-    """Custom user model that uses email for authentication"""
+    """Custom user model that uses email for authentication and confirmation"""
 
     email = models.EmailField(
         _("email address"),
@@ -32,6 +33,9 @@ class User(AbstractBaseUser, PermissionsMixin):
         unique=True,
         blank=False,
         null=False,
+        error_messages=_(
+            "a user with that email address already exists"
+        ),
     )
     first_name = models.CharField(
         _("first name"), max_length=75, blank=True
@@ -44,6 +48,12 @@ class User(AbstractBaseUser, PermissionsMixin):
         default=False,
         help_text="Designates whether User can log into admin site",
     )
+    is_email_verified = models.BooleanField(
+        _("verified by email"),
+        default=False,
+        help_text="toggles True if user has verified account by email",
+    )
+
     is_active = models.BooleanField(
         _("active status"),
         default=False,
@@ -81,6 +91,7 @@ class Profile(models.Model):
 
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     is_skipper = models.BooleanField(_("skipper status"), default=False)
+    country = CountryField()
     city = models.CharField(_("city/town"), max_length=100)
     province = models.CharField(_("province"), max_length=100)
     street_name = models.CharField(
