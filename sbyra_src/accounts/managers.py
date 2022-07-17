@@ -70,7 +70,9 @@ class UserManager(BaseUserManager):
 
         if extra_fields.get("is_superuser") is not True:
             raise ValueError(
-                _("Superuser status must be set to True for superuser")
+                _(
+                    "Superuser status must be set to True for a superuser"
+                )
             )
         if extra_fields.get("is_staff") is not True:
             raise ValueError(

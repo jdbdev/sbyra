@@ -96,6 +96,6 @@ Yacht.active.by_class('X')
 5. Run demo in shell: 
 
 ```
-py manage.py unleash_demo.py
+py manage.py unleash_demo
 ```
 * Note that an API key for openweather.org is required for weather context processor to function

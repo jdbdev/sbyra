@@ -33,9 +33,6 @@ class User(AbstractBaseUser, PermissionsMixin):
         unique=True,
         blank=False,
         null=False,
-        error_messages=_(
-            "a user with that email address already exists"
-        ),
     )
     first_name = models.CharField(
         _("first name"), max_length=75, blank=True
@@ -64,6 +61,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         default=timezone.now,
         help_text="Records when User first joins site",
     )
+    date_updated = models.DateTimeField(auto_now=True)
 
     objects = UserManager()
 
@@ -91,7 +89,7 @@ class Profile(models.Model):
 
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     is_skipper = models.BooleanField(_("skipper status"), default=False)
-    country = CountryField()
+    country = CountryField(_("country"), blank=True)
     city = models.CharField(_("city/town"), max_length=100)
     province = models.CharField(_("province"), max_length=100)
     street_name = models.CharField(
@@ -103,9 +101,13 @@ class Profile(models.Model):
     postal_code = models.CharField(
         _("postal code"),
         max_length=7,
+        help_text=_("format: A1AA1A"),
         validators=[validate_postal_code],
-    )  # create custom validator for postal codes - in progress!
+    )  # create custom validator for postal codes - Add ZIP code!
 
     class Meta:
         verbose_name = _("profile")
         verbose_name_plural = _("profiles")
+
+    def __str__(self):
+        return self.user.first_name + " " + self.user.last_name

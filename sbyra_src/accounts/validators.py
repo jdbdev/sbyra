@@ -20,21 +20,19 @@ Regex pattern for Canadian Postal Code:
 def validate_postal_code(postal_code):
     """Validation for Canadian and American postal/zip codes. Valid String must be length of 5 or 6."""
 
-    clean_postal_code = postal_code.replace(" ", "")
-    upper_postal = clean_postal_code.upper()
+    strip_postal_code = postal_code.replace(" ", "")
+    upper_postal = strip_postal_code.upper()
     postal_length = len(upper_postal)
+    postal_regex = r"[ABCEGHJKLMNPRSTVXY][0-9][ABCEGHJKLMNPRSTVWXYZ][0-9][ABCEGHJKLMNPRSTVWXYZ][0-9]"
+    zip_regex = r""
 
     if postal_length > 6 or postal_length < 5:
         raise ValidationError("Invalid postal or zip code")
 
-    # regex pattern match for Canadian postal codes:
+    # Canadian postal codes:
     elif postal_length == 6:
-        postal_regex = re.compile(
-            r"[ABCEGHJKLMNPRSTVXY][0-9][ABCEGHJKLMNPRSTVWXYZ][0-9][ABCEGHJKLMNPRSTVWXYZ][0-9]"
-        )
-        if re.match(postal_regex, upper_postal) is not True:
-            raise ValidationError("Invalid postal or zip code")
+        match = re.search(postal_regex, upper_postal)
+        if match == None:
+            raise ValidationError(f"Invalid postal code: {postal_code}")
 
-    # regex pattern match for American ZIP codes:
-    elif postal_length == 5:
-        zip_regex = re.compile(r"[]")
+    # American ZIP codes:
