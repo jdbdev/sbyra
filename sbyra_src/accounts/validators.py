@@ -12,7 +12,8 @@ Canadian postal codes cannot start with: W or Z
 Canadian postal codes cannot contain: D F I O Q
 
 Regex pattern for Canadian Postal Code: 
-[ABCEGHJKLMNPRSTVXY][0-9][ABCEGHJKLMNPRSTVWXYZ][0-9][ABCEGHJKLMNPRSTVWXYZ][0-9]
+Strict regex pattern: [ABCEGHJKLMNPRSTVXY][0-9][ABCEGHJKLMNPRSTVWXYZ][0-9][ABCEGHJKLMNPRSTVWXYZ][0-9]
+User Kind regex pattern: ???
 
 """
 
@@ -26,13 +27,16 @@ def validate_postal_code(postal_code):
     postal_regex = r"[ABCEGHJKLMNPRSTVXY][0-9][ABCEGHJKLMNPRSTVWXYZ][0-9][ABCEGHJKLMNPRSTVWXYZ][0-9]"
     zip_regex = r""
 
+    # Canadian or American postal code or zip validation:
     if postal_length > 6 or postal_length < 5:
         raise ValidationError("Invalid postal or zip code")
 
-    # Canadian postal codes:
+    # Canadian postal code validation:
     elif postal_length == 6:
         match = re.search(postal_regex, upper_postal)
         if match == None:
             raise ValidationError(f"Invalid postal code: {postal_code}")
 
-    # American ZIP codes:
+    # American ZIP code validation:
+    elif postal_length == 5:
+        pass

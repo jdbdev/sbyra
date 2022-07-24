@@ -1,7 +1,4 @@
-from django.contrib.auth.models import (
-    AbstractBaseUser,
-    PermissionsMixin,
-)
+from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -29,7 +26,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     email = models.EmailField(
         _("email address"),
-        max_length=75,
+        max_length=100,
         unique=True,
         blank=False,
         null=False,
@@ -46,7 +43,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         help_text="Designates whether User can log into admin site",
     )
     is_email_verified = models.BooleanField(
-        _("verified by email"),
+        _("verified email"),
         default=False,
         help_text="toggles True if user has verified account by email",
     )
