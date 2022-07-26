@@ -13,8 +13,11 @@ content: app_name='content'
 urlpatterns = [
     path("", include("sbyra_src.content.urls")),
     path("admin/", admin.site.urls),
-    path("accounts/", include("allauth.urls"), namespace="accounts"),
     path(
-        "racing/", include("sbyra_src.racing.urls"), namespace="racing"
+        "accounts/",
+        include("sbyra_src.accounts.urls", namespace="accounts"),
+    ),
+    path(
+        "racing/", include("sbyra_src.racing.urls", namespace="racing")
     ),
 ]

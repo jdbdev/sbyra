@@ -13,18 +13,18 @@ class RegistrationForm(forms.ModelForm):
     """Custom registration form for User model"""
 
     email = forms.EmailField(
-        label="Enter valid email",
+        label="Email",
         max_length=100,
-        help_text=_("Email required"),
+        help_text=_("Valid email required"),
         error_messages={"Required": "Please enter a valid email"},
     )
     first_name = forms.CharField(
-        label="Last Name",
+        label="First Name",
         max_length=75,
         help_text=_("First name required"),
     )
     last_name = forms.CharField(
-        label="First Name",
+        label="Last Name",
         max_length=75,
         help_text=_("Last name required"),
     )
@@ -36,7 +36,7 @@ class RegistrationForm(forms.ModelForm):
     password2 = forms.CharField(
         label="Repeat Password",
         widget=forms.PasswordInput,
-        help_text=_("Required: Repeat Password"),
+        help_text=_("Must match Password"),
     )
 
     class Meta:

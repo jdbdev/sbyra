@@ -1,6 +1,5 @@
 import environ
 import requests
-from django.shortcuts import render
 
 env = environ.Env()
 environ.Env.read_env()
@@ -16,10 +15,18 @@ def weather_api(request):
 
     """
 
-    api_key = env("WEATHER_API")
-    url = "http://api.openweathermap.org/data/2.5/weather?q={}&units=metric&appid={}"
+    # request parameters
     city = "Shediac"
-    r = requests.get(url.format(city, api_key)).json()
+    units = "metric"
+    api_key = env("WEATHER_API")
+    payload = {
+        "q": city,
+        "units": units,
+        "appid": api_key,
+    }
+    r = requests.get(
+        "http://api.openweathermap.org/data/2.5/weather", params=payload
+    ).json()
 
     # conversion factor for meters/sec to knots
     conversion = float(1.9438444924)

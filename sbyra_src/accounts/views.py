@@ -3,7 +3,7 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.template.loader import render_to_string
-from django.utils.encoding import force_bytes, force_text
+from django.utils.encoding import force_bytes, force_str
 from django.utils.http import (
     urlsafe_base64_decode,
     urlsafe_base64_encode,
@@ -53,12 +53,17 @@ def account_register(request):
         register_form = RegistrationForm()
         template = "accounts/registration/register.html"
         context = {"form": register_form}
+
         return render(request, template, context)
 
 
 @login_required
 def account_update(request):
     """Account update function"""
+
+    account_form = RegistrationForm(instance=request.user)
+    # account_profile = ProfileForm(instance=request.user)
+
     template = ""
     context = ""
     return render(request, template, context)
