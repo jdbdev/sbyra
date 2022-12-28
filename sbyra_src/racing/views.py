@@ -57,9 +57,7 @@ def yacht_register(request):
     return render(request, template, context)
 
 
-def yacht_details(
-    request, slug
-):  # slug being passed to view by yacht-details url
+def yacht_details(request, slug):  # slug being passed to view by yacht-details url
     """View shows yacht details based on slug from URL pattern"""
 
     yacht = get_object_or_404(Yacht, slug=slug)

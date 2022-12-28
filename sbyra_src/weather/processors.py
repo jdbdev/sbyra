@@ -1,5 +1,6 @@
 import environ
 import requests
+from django.contrib.sites.shortcuts import get_current_site
 
 env = environ.Env()
 environ.Env.read_env()
@@ -15,7 +16,7 @@ def weather_api(request):
 
     """
 
-    # request parameters
+    # request parameters (using params from the Request library instead of f formating the url string)
     city = "Shediac"
     units = "metric"
     api_key = env("WEATHER_API")
@@ -70,4 +71,6 @@ def weather_api(request):
         "wind_gust": wind_gust(),
     }
 
-    return {"weather": weather}
+    return {
+        "weather": weather,
+    }

@@ -169,13 +169,14 @@ class Series(RacingCommon):
     def __str__(self):
         return f"{self.name} {self.year}"
 
-    def save(self, *args, **kwargs):
-        t_now = datetime.datetime.now()
-        t1 = self.year
-        t2 = t_now.year
-        if t1 < t2:
-            self.current_year = False
-        super(Series, self).save(*args, **kwargs)
+    # def save(self, *args, **kwargs):
+    #     """override save() method to set current_year status"""
+    #     t_now = datetime.datetime.now()
+    #     t1 = self.year
+    #     t2 = t_now.year
+    #     if t1 < t2:
+    #         self.current_year = False
+    #     super(Series, self).save(*args, **kwargs)
 
 
 class Event(RacingCommon):
@@ -229,6 +230,9 @@ class Result(RacingCommon):
         blank=True,
         null=True,
         help_text=_("Format: HH:MM:SS"),
+    )
+    used_spinnaker = models.BooleanField(
+        default=False, help_text=_("spinnaker used during event")
     )
     notes = models.TextField(
         max_length=100, blank=True, help_text=_("add any result notes")
@@ -304,7 +308,11 @@ class Result(RacingCommon):
 
         # Establish all inputs:
         active_status = self.yacht.is_active
-        phrf_rating = self.yacht.phrf_rating
+        used_spinnaker = self.used_spinnaker
+        if used_spinnaker:
+            phrf_rating = (self.yacht.phrf_rating) - 18
+        else:
+            phrf_rating = self.yacht.phrf_rating
         time_correction_factor = 650 / (520 + phrf_rating)
         start_time = self.yacht_class_start
         finish_time = self.finish_time

@@ -3,7 +3,7 @@ from django.utils.translation import gettext_lazy as _
 
 
 class UserManager(BaseUserManager):
-    """Custom object manager for User model"""
+    """Custom object manager class for User model"""
 
     def _create_user(
         self,
