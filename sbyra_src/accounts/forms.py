@@ -57,7 +57,7 @@ class RegistrationForm(forms.ModelForm):
             "password2",
         )
 
-    # Form level verifications (def clean_fieldname(self, *args, **kwargs):
+    # Form level validations (example: def clean_fieldname(self, *args, **kwargs):
 
     def clean_email(self):
         """additional clean method to verify if email already exists in DB and returns email if unique"""
@@ -68,12 +68,14 @@ class RegistrationForm(forms.ModelForm):
             )
         return email
 
-    def clean_password2(self):
-        """additional clean method verfifies if password2 matches password and returns password2 if matching"""
-        clean = self.cleaned_data
-        if clean["password"] != clean["password2"]:
-            raise forms.ValidationError("passwords do not match")
-        return clean["password2"]
+    def clean(self):
+        """additional clean method validation verfifies if password2 matches password and returns password2 if matching"""
+        cleaned_data = super().clean()
+        password = cleaned_data["password"]
+        password2 = cleaned_data["password2"]
+        if password is not None and password != password2:
+            self.add_error("password2", "passwords do not match")
+        return cleaned_data
 
 
 class CustomUserChangeForm(UserChangeForm):
