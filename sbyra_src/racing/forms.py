@@ -8,7 +8,7 @@ class YachtForm(ModelForm):
     """Form to register a new yacht"""
 
     class Meta:
-        model = YachtClub
+        model = Yacht
         fields = "__all__"
 
     class Meta:

@@ -53,7 +53,7 @@ def weather_api(request):
         return wind_direction
 
     def wind_gust():
-        """verifies that api returns and value and converts value from m/s to knots"""
+        """verifies that api returns a value and converts value from m/s to knots"""
         key = "gust"
         wind_gust = "unknown"
 

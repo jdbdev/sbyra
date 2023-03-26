@@ -1,6 +1,22 @@
 <h1>Registration Form</h1>
+
 <form action="." method="post">
     {% csrf_token %}
+
     {{ form.as_p }}
+
+    {% if form.errors %}
+        <h3>Please correct errors:</h3>
+        {% for field in form %}
+            {% if field.errors %}
+            <div>
+                <h3>
+                    {{field.label}}: {{ field.errors|striptags }}
+                </h3>
+            </div>
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+
     <button type="submit">Register</button>
 </form>

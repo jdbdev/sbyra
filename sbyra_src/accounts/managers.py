@@ -18,14 +18,14 @@ class UserManager(BaseUserManager):
         Provides base validation for required fields; email, first_name, last_name
         """
         if not email:
-            raise ValueError(_("Members must have an email address"))
+            raise ValueError(_("Members must provide an email address"))
         email = self.normalize_email(email)
 
         if not first_name:
-            raise ValueError(_("You must enter a first name"))
+            raise ValueError(_("You must provide a first name"))
 
         if not last_name:
-            raise ValueError(_("You must enter a last name"))
+            raise ValueError(_("You must provide a last name"))
 
         user = self.model(
             email=email,
@@ -58,7 +58,7 @@ class UserManager(BaseUserManager):
         if extra_fields.get("is_saff") is not True:
             raise ValueError("Staff status must be set to True")
         return self._create_user(
-            email, password, first_name, last_name**extra_fields
+            email, password, first_name, last_name, **extra_fields
         )
 
     def create_superuser(

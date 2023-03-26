@@ -15,14 +15,14 @@ from .tokens import account_activation_token
 
 
 def account_register(request):
-    """Account registration function that also verifies if user is logged in"""
+    """Account registration function that also verifies if user is already registered and sends activation email"""
     if request.user.is_authenticated:
         return redirect("racing:racing-home")
 
     if request.method == "POST":
-        # get the POST data:
+        # 01 get the POST data:
         register_form = RegistrationForm(request.POST)
-        # Validate and capture POST data:
+        # 02 Validate and capture POST data:
         if register_form.is_valid():
             user = register_form.save(commit=False)
             user.email = register_form.cleaned_data["email"]
@@ -31,7 +31,8 @@ def account_register(request):
             user.set_password(register_form.cleaned_data["password"])
             user.is_active = False  # set as default in User model
             user.save()
-            # Generate activation email:
+
+            # 03 Generate activation email:
             current_site = get_current_site(request)
             subject = "Activate your SBYRA account"
             message = render_to_string(
@@ -39,11 +40,14 @@ def account_register(request):
                 {
                     "user": user,
                     "domain": current_site.domain,
-                    "uid": urlsafe_base64_encode(force_bytes(user.pk)),
+                    "uid": urlsafe_base64_encode(
+                        force_bytes(user.pk)
+                    ),  # bytestring to base64 string for url use.
                     "token": account_activation_token.make_token(user),
                 },
             )
-            # Send activation email
+
+            # 04 Send activation email
             user.email_user(subject=subject, message=message)
             return HttpResponse(
                 "Thank you for registering! An activation email has been sent."

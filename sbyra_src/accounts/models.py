@@ -35,10 +35,16 @@ class User(AbstractBaseUser, PermissionsMixin):
         null=False,
     )
     first_name = models.CharField(
-        _("first name"), max_length=75, blank=True
+        _("first name"),
+        max_length=75,
+        blank=True,
+        help_text="required",
     )
     last_name = models.CharField(
-        _("last name"), max_length=75, blank=True
+        _("last name"),
+        max_length=75,
+        blank=True,
+        help_text="required",
     )
     is_staff = models.BooleanField(
         _("staff status"),
@@ -103,7 +109,7 @@ class Profile(models.Model):
         max_length=7,
         help_text=_("format: A1AA1A"),
         validators=[validate_postal_code],
-    )  # create custom validator for postal codes - Add ZIP code!
+    )  # refer to validators.py for custom validators
 
     class Meta:
         verbose_name = _("profile")
