@@ -55,10 +55,12 @@ def account_register(request):
 
     else:
         register_form = RegistrationForm()
-        template = "accounts/registration/register.html"
-        context = {"form": register_form}
 
-        return render(request, template, context)
+    return render(
+        request,
+        "accounts/registration/register.html",
+        {"form": register_form},
+    )
 
 
 @login_required

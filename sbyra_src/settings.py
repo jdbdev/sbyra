@@ -168,7 +168,7 @@ ACCOUNT_UNIQUE_EMAIL = True
 
 # ### -------------------- EMAIL SETTINGS -------------------- ###
 
-# EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 # EMAIL_PORT = 587
 # EMAIL_USE_TLS = True
 # EMAIL_HOST = env("EMAIL_HOST")

@@ -18,13 +18,17 @@ class RegistrationForm(forms.ModelForm):
         label="Email",
         max_length=100,
         help_text=_("required"),
-        # error_messages={"a valid email is required to register"},
+        error_messages={
+            "required": "a valid email is required to register"
+        },
     )
     first_name = forms.CharField(
         label="First Name",
         max_length=75,
         help_text=_("required"),
-        # error_messages={"your first name is required to register"},
+        error_messages={
+            "required": "your first name is required to register"
+        },
     )
     last_name = forms.CharField(
         label="Last Name",
@@ -52,6 +56,24 @@ class RegistrationForm(forms.ModelForm):
             "password",
             "password2",
         )
+
+    # Form level verifications (def clean_fieldname(self, *args, **kwargs):
+
+    def clean_email(self):
+        """additional clean method to verify if email already exists in DB and returns email if unique"""
+        email = self.cleaned_data["email"]
+        if User.objects.filter(email=email).exists():
+            raise forms.ValidationError(
+                "This email already exists. Please login to your account."
+            )
+        return email
+
+    def clean_password2(self):
+        """additional clean method verfifies if password2 matches password and returns password2 if matching"""
+        clean = self.cleaned_data
+        if clean["password"] != clean["password2"]:
+            raise forms.ValidationError("passwords do not match")
+        return clean["password2"]
 
 
 class CustomUserChangeForm(UserChangeForm):
