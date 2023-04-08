@@ -13,7 +13,7 @@ def validate_year(value):
     """
 
     def digitize(n: int):
-        """Converts int to list of ints - requires converting passed argument (n) to a string since type int is not iterable."""
+        """Converts int to list of ints - requires converting passed argument (n) to a string since data type int is not iterable."""
         return [int(d) for d in str(n)]
 
     # def digitize(n):

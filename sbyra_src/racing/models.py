@@ -153,7 +153,10 @@ class Series(RacingCommon):
         validators=[validate_year],
     )
     current_year = models.BooleanField(
-        default=True, help_text=_("archived if not current year")
+        default=True,
+        help_text=_(
+            "archived if not current year"
+        ),  # needs celevery script to check status
     )
     notes = models.TextField(
         max_length=500, help_text=_("maximum 500 characters")
@@ -168,15 +171,6 @@ class Series(RacingCommon):
 
     def __str__(self):
         return f"{self.name} {self.year}"
-
-    # def save(self, *args, **kwargs):
-    #     """override save() method to set current_year status"""
-    #     t_now = datetime.datetime.now()
-    #     t1 = self.year
-    #     t2 = t_now.year
-    #     if t1 < t2:
-    #         self.current_year = False
-    #     super(Series, self).save(*args, **kwargs)
 
 
 class Event(RacingCommon):
@@ -203,6 +197,7 @@ class Event(RacingCommon):
     class Meta:
         ordering = ["event_date"]
         verbose_name_plural = "events"
+        unique_together = [["event", "yacht"]]
 
     def __str__(self):
         return str(self.event_date)
@@ -275,9 +270,9 @@ class Result(RacingCommon):
         Corrected Time Algorithm:
 
         1. Establish start time based on yach's racing class and event's corresponding start time
-        2. Convert start time and finish time to seconds for further processing
+        2. Convert start time and finish time to seconds for processing
         3. Calculate elapsed time in seconds between start time and finish time
-        4. Apply time correction factor based on phrf_rating and known formula
+        4. Apply time correction factor based on phrf_rating and yacht club's formula (may vary)
         5. Convert corrected time above (seconds) into datetime.time object for model TimeField()
         6. Save final datetime.time object into Result.posted_time
 
@@ -286,7 +281,7 @@ class Result(RacingCommon):
         """
 
         def convert_to_seconds(time_obj) -> int:
-            """Function takes a datetime.time object, converts into seconds and returns an Int type"""
+            """Converts a datetime.time object into seconds and returns and Int type"""
             seconds = (
                 (time_obj.hour * 3600)
                 + (time_obj.minute * 60)

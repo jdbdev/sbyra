@@ -1,3 +1,4 @@
+from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.sites.shortcuts import get_current_site
 from django.http import HttpResponse
@@ -12,6 +13,11 @@ from django.utils.http import (
 from .forms import RegistrationForm
 from .models import User
 from .tokens import account_activation_token
+
+
+@login_required
+def dashboard(request):
+    return render(request, "accounts/user/dashboard", {})
 
 
 def account_register(request):
@@ -47,7 +53,7 @@ def account_register(request):
                 },
             )
 
-            # 04 Send activation email
+            # 04 Send activation email (email_user() calls send_mail() function in models.py.User)
             user.email_user(subject=subject, message=message)
             return HttpResponse(
                 "Thank you for registering! An activation email has been sent."
@@ -61,6 +67,27 @@ def account_register(request):
         "accounts/registration/register.html",
         {"form": register_form},
     )
+
+
+def account_activate(
+    request, uidb64, token
+):  # refer to accounts.urls.py for passed parameters uidb64 and token
+    try:
+        uid = force_str(urlsafe_base64_decode(uidb64))
+        user = User.objects.get(pk=uid)
+    except (TypeError, ValueError, OverflowError, user.DoesNotExist):
+        user = None
+    if user is not None and account_activation_token.check_token(
+        user, token
+    ):
+        user.is_active = True
+        user.save()
+        login(request, user)
+        return redirect("racing:dashboard")
+    else:
+        return redirect(
+            request, "accounts/registration/activation_failed.html"
+        )
 
 
 @login_required
