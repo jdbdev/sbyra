@@ -30,16 +30,18 @@ User = settings.AUTH_USER_MODEL
 
 
 """ 
-All models related to yacht racing, including yachts, clubs, events and results. This file contains only models.Model classes. 
+All models related to yacht racing, including yachts, yacht clubs, events and results. This file contains only models.Model classes. 
 Refer to separate files for;
 
 managers.py (all models.Manager classes and custom methods)
 signals.py (all receiver functions and signals)
 choices.py (all related models.TextChoices classes for choice fields)
-validators.py (additional data validation functions)
-utils.py (time conversion utilities)
+sbyra_src.utils (project level utility functions and validators)
 
-Any changes to models to remain explicit and include help_text.
+- Models to remain explicit and include help_text.
+- Do not include null=True in CharField unless unique=True and blank=True are set together
+- Do not include null=True in EmailField, CharField, SlugField
+- Keep model methods minimal and use other modules for additional functionality when possible
 
 """
 
@@ -80,6 +82,13 @@ class YachtClub(RacingCommon):
     street_number = models.CharField(
         max_length=10, blank=True, help_text=_("street number")
     )
+    postal_code = models.CharField(
+        _("postal code"),
+        max_length=7,
+        blank=True,
+        help_text=_("format: A1AA1A"),
+        validators=[validate_postal_code],
+    )
     contact_first_name = models.CharField(
         max_length=100, blank=True, help_text=_("contact first name")
     )
@@ -104,7 +113,7 @@ class YachtClub(RacingCommon):
 class Yacht(RacingCommon):
     """Yacht class describing all attributes of an individual yacht"""
 
-    name = models.CharField(
+    yacht_name = models.CharField(
         max_length=100,
         blank=False,
         unique=True,
@@ -116,13 +125,13 @@ class Yacht(RacingCommon):
         verbose_name="Web safe URL",
     )
     skipper = models.ForeignKey(
-        User,
+        User,  # Many-to-one relationship
         blank=True,
         null=True,
-        on_delete=models.CASCADE,
-        related_name="yachts",  # user.yachts.all()
+        related_name="yachts",  # User.yachts.all()
         help_text=_("yacht skipper"),
         verbose_name="skipper",
+        on_delete=models.CASCADE,
     )
     sail_num = models.CharField(
         max_length=25,
@@ -139,6 +148,13 @@ class Yacht(RacingCommon):
         choices=YachtClassChoices.choices,
         blank=True,
         help_text=_("required to race"),
+    )
+    yacht_club = models.ForeignKey(
+        YachtClub,  # Many-to-one relationship
+        blank=True,
+        null=True,
+        related_name="yachts",  # YachtClub.yachts.all()
+        on_delete=models.CASCADE,
     )
     phrf_rating = models.DecimalField(
         max_digits=4,

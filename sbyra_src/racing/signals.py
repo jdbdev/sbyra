@@ -10,7 +10,7 @@ from .models import Yacht, YachtClub
 @receiver(pre_save, sender=Yacht)
 def slug_pre_save(sender, instance, *args, **kwargs):
     """signal sets slug to match name as a web safe url"""
-    name = instance.name
+    name = instance.yacht_name
     slug = instance.slug
     if slug is None:
         instance.slug = slugify(name)
