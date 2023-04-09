@@ -1,9 +1,13 @@
+# Pythom Module Imports:
 import datetime
 
+# Django Module Imports:
 from django.conf import settings
 from django.db import models
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
+
+# Project level imports:
 from sbyra_src.racing.choices import (
     CompletionStatusChoice,
     YachtClassChoices,
@@ -15,10 +19,12 @@ from sbyra_src.racing.managers import (
     DefaultYachtManager,
 )
 
-from .utils import convert_to_seconds, convert_to_time_object
-
-# Custom utilities, functions and validators
-from .validators import validate_year
+# Custom project level utility functions and validators:
+from utils.model_validators import validate_postal_code, validate_year
+from utils.time_conversions import (
+    convert_to_seconds,
+    convert_to_time_object,
+)
 
 User = settings.AUTH_USER_MODEL
 

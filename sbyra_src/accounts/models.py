@@ -8,8 +8,7 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django_countries.fields import CountryField
 from sbyra_src.accounts.managers import UserManager
-
-from .validators import validate_postal_code
+from utils.model_validators import validate_postal_code
 
 """
 Custom User model implementation using django-allauth for email authentication. AbstractBaseUser allows Users to be created
