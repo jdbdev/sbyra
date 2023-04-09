@@ -4,7 +4,7 @@ from django.db import models
 class YachtClassChoices(models.TextChoices):
     """Yacht table classifications"""
 
-    # CONSTANT = DB_Value, User Display Value
+    # CONSTANT = "DB_Value", "User Display Value"
     A = "A", "Class A"
     A1 = "A1", "Class A1"
     B = "B", "Class B"

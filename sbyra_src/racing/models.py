@@ -15,6 +15,9 @@ from sbyra_src.racing.managers import (
     DefaultYachtManager,
 )
 
+from .utils import convert_to_seconds, convert_to_time_object
+
+# Custom utilities, functions and validators
 from .validators import validate_year
 
 User = settings.AUTH_USER_MODEL
@@ -28,6 +31,7 @@ managers.py (all models.Manager classes and custom methods)
 signals.py (all receiver functions and signals)
 choices.py (all related models.TextChoices classes for choice fields)
 validators.py (additional data validation functions)
+utils.py (time conversion utilities)
 
 Any changes to models to remain explicit and include help_text.
 
@@ -156,7 +160,7 @@ class Series(RacingCommon):
         default=True,
         help_text=_(
             "archived if not current year"
-        ),  # needs celevery script to check status
+        ),  # needs celevery script for periodic status check
     )
     notes = models.TextField(
         max_length=500, help_text=_("maximum 500 characters")
@@ -190,7 +194,7 @@ class Event(RacingCommon):
     notes = models.TextField(
         max_length=200,
         blank=True,
-        help_text="Add relevant event comments",
+        help_text="Add general event comments",
     )
     yachts = models.ManyToManyField(Yacht, through="Result")
 
@@ -217,7 +221,9 @@ class Result(RacingCommon):
     finish_time = models.TimeField(
         blank=True, null=True, help_text=_("Format: HH:MM:SS")
     )
-    over_line = models.IntegerField()
+    order_over_line = models.IntegerField(
+        blank=True, null=True, help_text=_("enter sequence number")
+    )
     time_penalty = models.TimeField(
         blank=True, null=True, help_text=_("Format: HH:MM:SS")
     )
@@ -245,7 +251,7 @@ class Result(RacingCommon):
     def yacht_class_start(self):
         """
         Returns racing class start time for a specific yacht in a specific event based on yacht racing class.
-        Called by calc_corrected_time property/method.
+        Called by calc_corrected_time property/method. Class start times are in Event model.
 
         """
         yacht_class = self.yacht.yacht_class
@@ -262,7 +268,7 @@ class Result(RacingCommon):
     @property
     def calc_corrected_time(self):
         """
-        Returns the yacht's corrected time based on its elapsed time and time correction factor, and applies any penalties.
+        Returns the yacht's corrected time based on its elapsed time and time correction factors (phrf rating, penalties, etc.).
         Returns result only for active yachts that have completed the event. Returns None for all other yachts.
 
         *sbyra time correction factor used: 650/(520 + phrf_rating)*
@@ -279,21 +285,6 @@ class Result(RacingCommon):
         Method called by save() to enter corrected time in posted_time field
 
         """
-
-        def convert_to_seconds(time_obj) -> int:
-            """Converts a datetime.time object into seconds and returns and Int type"""
-            seconds = (
-                (time_obj.hour * 3600)
-                + (time_obj.minute * 60)
-                + (time_obj.second)
-            )
-            return seconds
-
-        def convert_to_time_object(seconds):
-            """Function converts string to datetime.time object"""
-            min, sec = divmod(seconds, 60)
-            hour, min = divmod(min, 60)
-            return datetime.time(hour, min, sec)
 
         # Establish completed status:
         if self.completed_status == "CMP":
