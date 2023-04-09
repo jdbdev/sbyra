@@ -61,10 +61,9 @@ class RacingCommon(models.Model):
 class YachtClub(RacingCommon):
     """Yacht Club information - not required for racing functionality"""
 
-    name = models.CharField(
+    yacht_club_name = models.CharField(
         max_length=100,
         blank=False,
-        null=True,
         unique=True,
         help_text=_("enter yacht club name"),
     )
@@ -73,6 +72,34 @@ class YachtClub(RacingCommon):
         null=True,
         help_text=_("web safe url"),
     )
+    city = models.CharField(
+        max_length=100, blank=True, help_text=_("city or town of club")
+    )
+    street_name = models.CharField(
+        max_length=100, blank=True, help_text=_("street of club")
+    )
+    street_number = models.CharField(
+        max_length=10, blank=True, help_text=_("street number")
+    )
+    contact_first_name = models.CharField(
+        max_length=100, blank=True, help_text=_("contact first name")
+    )
+    contact_last_name = models.CharField(
+        max_length=100, blank=True, help_text=_("contact last name")
+    )
+    email = models.EmailField(
+        _("email address"),
+        max_length=100,
+        blank=True,
+        help_text=_("contact's email"),
+    )
+
+    class Meta:
+        verbose_name = _("yacht club")
+        verbose_name_plural = _("yacht clubs")
+
+    def __str__(self):
+        return self.yacht_club_name
 
 
 class Yacht(RacingCommon):

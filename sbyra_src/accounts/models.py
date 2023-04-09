@@ -1,3 +1,4 @@
+# Django Module Imports:
 from django.contrib.auth.models import (
     AbstractBaseUser,
     PermissionsMixin,
@@ -7,7 +8,11 @@ from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django_countries.fields import CountryField
+
+# Project Level Imports:
 from sbyra_src.accounts.managers import UserManager
+
+# Custom project level utility functions and validators:
 from utils.model_validators import validate_postal_code
 
 """
@@ -119,7 +124,7 @@ class Profile(models.Model):
         max_length=7,
         help_text=_("format: A1AA1A"),
         validators=[validate_postal_code],
-    )  # refer to validators.py for custom validators
+    )  # refer utils for custom validators
 
     class Meta:
         verbose_name = _("profile")
