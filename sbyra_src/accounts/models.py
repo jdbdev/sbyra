@@ -122,6 +122,7 @@ class Profile(models.Model):
     postal_code = models.CharField(
         _("postal code"),
         max_length=7,
+        blank=True,
         help_text=_("format: A1AA1A"),
         validators=[validate_postal_code],
     )  # refer utils for custom validators

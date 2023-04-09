@@ -69,7 +69,6 @@ class YachtClub(RacingCommon):
     )
     slug = models.SlugField(
         blank=True,
-        null=True,
         help_text=_("web safe url"),
     )
     city = models.CharField(
@@ -108,13 +107,11 @@ class Yacht(RacingCommon):
     name = models.CharField(
         max_length=100,
         blank=False,
-        null=True,
         unique=True,
         help_text=_("yacht name"),
     )
     slug = models.SlugField(
         blank=True,
-        null=True,
         help_text=_("web safe url"),
         verbose_name="Web safe URL",
     )
@@ -130,6 +127,7 @@ class Yacht(RacingCommon):
     sail_num = models.CharField(
         max_length=25,
         blank=True,
+        unique=True,
         help_text=_("Main sail number"),
         verbose_name="sail number",
     )
@@ -140,7 +138,6 @@ class Yacht(RacingCommon):
         max_length=2,
         choices=YachtClassChoices.choices,
         blank=True,
-        null=True,
         help_text=_("required to race"),
     )
     phrf_rating = models.DecimalField(
@@ -178,7 +175,6 @@ class Series(RacingCommon):
     name = models.CharField(
         max_length=100,
         blank=False,
-        null=True,
         unique=True,
         verbose_name="Series Name",
         help_text=_("Example: Weekly Regatta"),
