@@ -1,6 +1,6 @@
 import datetime
 
-""" Utility functions for to convert and manipulate datetime.time objects"""
+""" Utility functions to convert and manipulate datetime.time objects"""
 
 
 def convert_to_seconds(time_obj) -> int:

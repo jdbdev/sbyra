@@ -20,8 +20,11 @@ from sbyra_src.racing.managers import (
 )
 
 # Custom project level utility functions and validators:
-from utils.model_validators import validate_postal_code, validate_year
-from utils.time_conversions import (
+from sbyra_src.utils.model_validators import (
+    validate_postal_code,
+    validate_year,
+)
+from sbyra_src.utils.time_conversions import (
     convert_to_seconds,
     convert_to_time_object,
 )
@@ -42,12 +45,14 @@ sbyra_src.utils (project level utility functions and validators)
 - Do not include null=True in CharField unless unique=True and blank=True are set together
 - Do not include null=True in EmailField, CharField, SlugField
 - Keep model methods minimal and use other modules for additional functionality when possible
+- Use on_delete=SET_NULL to preserve data entries
+- Stay DRY and Keep common attributes and functionality in RacingCommon abstract model class.
 
 """
 
 
 class RacingCommon(models.Model):
-    """Abstract class for common time fields used in all other model classes"""
+    """Abstract class for attributes and methods to be used by all other models"""
 
     created = models.DateTimeField(
         auto_now_add=True, null=True
@@ -58,6 +63,15 @@ class RacingCommon(models.Model):
 
     class Meta:
         abstract = True
+
+    def soft_delete(self):
+        """allows a soft delete of data entries with restore capabilities"""
+        self.is_deleted = True
+        self.save()
+
+    def restore(self):
+        self.is_deleted = False
+        self.save()
 
 
 class YachtClub(RacingCommon):
@@ -131,7 +145,7 @@ class Yacht(RacingCommon):
         related_name="yachts",  # User.yachts.all()
         help_text=_("yacht skipper"),
         verbose_name="skipper",
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,  # skipper field will be set to null if a User is deleted
     )
     sail_num = models.CharField(
         max_length=25,
@@ -154,7 +168,7 @@ class Yacht(RacingCommon):
         blank=True,
         null=True,
         related_name="yachts",  # YachtClub.yachts.all()
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,  # yacht_club field will be set to null if a User is deleted
     )
     phrf_rating = models.DecimalField(
         max_digits=4,
@@ -172,7 +186,7 @@ class Yacht(RacingCommon):
     active = ActiveYachtManager()  # Yacht.active.all()
 
     class Meta:
-        ordering = ["name"]
+        ordering = ["yacht_name"]
         verbose_name_plural = "yachts"
 
     def __str__(self):
@@ -246,7 +260,6 @@ class Event(RacingCommon):
     class Meta:
         ordering = ["event_date"]
         verbose_name_plural = "events"
-        unique_together = [["event", "yacht"]]
 
     def __str__(self):
         return str(self.event_date)

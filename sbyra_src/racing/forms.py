@@ -14,7 +14,7 @@ class YachtForm(ModelForm):
     class Meta:
         model = Yacht
         fields = (
-            "name",
+            "yacht_name",
             "skipper",
             "sail_num",
             "yacht_type",
