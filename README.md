@@ -36,6 +36,7 @@ sbyra_src
   - content (App - blog, articles, static web content)
   - demo (run demo from cmd line)
   - racing (App - all racing related functionality)
+  - utils (commo utility functions and validators)
   - weather (App - openweathermap.org api call)
   - tests (pytest testing suite)
   - settings.py

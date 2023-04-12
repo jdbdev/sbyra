@@ -5,7 +5,7 @@ from .models import Event, Result, Series, Yacht, YachtClub
 
 
 class YachtForm(ModelForm):
-    """Form to register a new yacht"""
+    """Registration and edit form for Yachts"""
 
     class Meta:
         model = Yacht
@@ -19,7 +19,9 @@ class YachtForm(ModelForm):
             "sail_num",
             "yacht_type",
             "yacht_class",
+            "yacht_club",
             "phrf_rating",
+            "spinnaker_adjust",
         )
 
 

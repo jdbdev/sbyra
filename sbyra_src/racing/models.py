@@ -10,7 +10,8 @@ from django.utils.translation import gettext_lazy as _
 # Project level imports:
 from sbyra_src.racing.choices import (
     CompletionStatusChoice,
-    YachtClassChoices,
+    SpinnakerClassChoice,
+    YachtClassChoice,
 )
 from sbyra_src.racing.managers import (
     ActiveYachtManager,
@@ -60,10 +61,12 @@ class RacingCommon(models.Model):
     updated = models.DateTimeField(
         auto_now=True, null=True
     )  # null=True temporary only for testing
+    is_deleted = models.BooleanField(default=False)
 
     class Meta:
         abstract = True
 
+    # Soft delete and restore functionality *temporary solution needs review*
     def soft_delete(self):
         """allows a soft delete of data entries with restore capabilities"""
         self.is_deleted = True
@@ -124,6 +127,30 @@ class YachtClub(RacingCommon):
         return self.yacht_club_name
 
 
+class Spinnaker(RacingCommon):
+    """Spinnaker class with adjustment value used in Result table to calculate corrected time"""
+
+    spinnaker_class_name = models.CharField(
+        max_length=3,
+        choices=SpinnakerClassChoice.choices,
+        blank=False,
+        help_text=_("example: S1"),
+        verbose_name="spinnaker class",
+    )
+    adjustment_value = models.IntegerField(
+        max_length=3,
+        help_text=_("phrf correction value based on spinnaker class"),
+        verbose_name="spinnaker class adjustment",
+    )
+
+    class Meta:
+        ordering = ["spinnaker_class_name"]
+        verbose_name_plural = "spinnaker"
+
+    def __str__(self):
+        return self.spinnaker_class_name
+
+
 class Yacht(RacingCommon):
     """Yacht class describing all attributes of an individual yacht"""
 
@@ -159,7 +186,7 @@ class Yacht(RacingCommon):
     )
     yacht_class = models.CharField(
         max_length=2,
-        choices=YachtClassChoices.choices,
+        choices=YachtClassChoice.choices,
         blank=True,
         help_text=_("required to race"),
     )
@@ -168,7 +195,7 @@ class Yacht(RacingCommon):
         blank=True,
         null=True,
         related_name="yachts",  # YachtClub.yachts.all()
-        on_delete=models.SET_NULL,  # yacht_club field will be set to null if a User is deleted
+        on_delete=models.SET_NULL,
     )
     phrf_rating = models.DecimalField(
         max_digits=4,
@@ -176,6 +203,12 @@ class Yacht(RacingCommon):
         blank=True,
         null=True,
         help_text=_("required to race"),
+    )
+    spinnaker_class = models.ForeignKey(
+        Spinnaker,  # Many-to-one relationship,
+        blank=True,
+        null=True,
+        on_delete=models.SET_NULL,
     )
     is_active = models.BooleanField(
         default=False,
@@ -190,13 +223,19 @@ class Yacht(RacingCommon):
         verbose_name_plural = "yachts"
 
     def __str__(self):
-        return self.name
+        return self.yacht_name
 
     def get_absolute_url(self):
         # return f"/yachts/{self.slug}/"
         # pass to yacht-details url the keyword arguments - slug
         slug = self.slug
         return reverse("yacht-details", kwargs={"slug": slug})
+
+    @property
+    def spinnaker_adjust(self):
+        """Returns an int value to be used in Result table calc_corrected_time property for phrf adjustment"""
+        value = self.spinnaker_class.adjustment_value
+        return int(value)
 
 
 class Series(RacingCommon):
@@ -350,13 +389,16 @@ class Result(RacingCommon):
         else:
             completed = False
 
-        # Establish all inputs:
+        # Establish all other inputs:
         active_status = self.yacht.is_active
         used_spinnaker = self.used_spinnaker
+        # Additional phrf adjustment based on spinnaker use and yacht's spinnaker class:
         if used_spinnaker:
-            phrf_rating = (self.yacht.phrf_rating) - 18
+            phrf_rating = int(
+                (self.yacht.phrf_rating) - (self.yacht.spinnaker_adjust)
+            )
         else:
-            phrf_rating = self.yacht.phrf_rating
+            phrf_rating = int(self.yacht.phrf_rating)
         time_correction_factor = 650 / (520 + phrf_rating)
         start_time = self.yacht_class_start
         finish_time = self.finish_time
