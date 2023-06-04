@@ -29,8 +29,6 @@ def yacht_is_active(sender, instance, *args, **kwargs):
 
 @receiver(pre_save, sender=YachtClub)
 def slug_pre_save(sender, instance, *args, **kwargs):
-    """signal sets slug to match name as a web safe url"""
-    name = instance.yacth_club_name
-    slug = instance.slug
-    if slug is None:
-        instance.slug = slugify(name)
+    """Signal sets slug to match name as a web safe url. Updating name will result in updated slug"""
+    name = instance.yacht_club_name
+    instance.slug = slugify(name)

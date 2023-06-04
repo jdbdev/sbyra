@@ -9,7 +9,7 @@ environ.Env.read_env()
 def weather_api(request):
 
     """
-    API call to openweathermap.org and return a context dictionary
+    API call to openweathermap.org and returns a context dictionary
 
     Values returned in Metric (temp = Celcius, Wind speeds = meters/sec)
     API does not always return key values. Functions check for keys:values to prevent errors and convert wind speed and wind gusts from meters/second to knots (kt, kn). Values rounded to 2 decimal places.

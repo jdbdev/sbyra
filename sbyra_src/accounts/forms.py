@@ -79,13 +79,6 @@ class RegistrationForm(forms.ModelForm):
             self.add_error("password2", "passwords do not match")
         return cleaned_data
 
-    # def clean_password2(self):
-    #     clean_password2=self.cleaned_data["password2"]
-    #     clean_password=self.cleaned_data["password"]
-    #     if clean_password2 != clean_password:
-    #         raise forms.ValidationError("passwords do not match")
-    #     return clean_password2
-
 
 class CustomUserChangeForm(UserChangeForm):
     """Form to update User information"""

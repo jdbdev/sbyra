@@ -1,10 +1,11 @@
 from django.db import models
 
+""" All choices follow pattern: CONSTANT = "DB_Value", "User Display Value" """
+
 
 class YachtClassChoice(models.TextChoices):
     """Yacht table classifications"""
 
-    # CONSTANT = "DB_Value", "User Display Value"
     A = "A", "Class A"
     A1 = "A1", "Class A1"
     B = "B", "Class B"
@@ -15,16 +16,15 @@ class YachtClassChoice(models.TextChoices):
 class CompletionStatusChoice(models.TextChoices):
     """Completion status choices for the Event class"""
 
-    # CONSTANT = DB_Value, User Display Value
     CMP = "CMP", "Completed"
     DNC = "DNC", "Did Not Complete"
     DSQ = "DSQ", "Disqualified"
 
 
 class SpinnakerClassChoice(models.TextChoices):
-    """Spinnaker class choices to establish additional time corrections"""
+    """Spinnaker class choices to establish additional time corrections. Allows user to customize correction times."""
 
-    # CONSTANT = DB_Value, User Display Value
+    S0 = "S0", "Spinnaker class 0"
     S1 = "S1", "Spinnaker class 1"
     S2 = "S2", "Spinnaker class 2"
     S3 = "S3", "Spinnaker class 3"

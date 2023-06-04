@@ -1,15 +1,11 @@
 from django import forms
 from django.forms import ModelForm
 
-from .models import Event, Result, Series, Yacht, YachtClub
+from .models import Event, Result, Series, Spinnaker, Yacht, YachtClub
 
 
 class YachtForm(ModelForm):
     """Registration and edit form for Yachts"""
-
-    class Meta:
-        model = Yacht
-        fields = "__all__"
 
     class Meta:
         model = Yacht
@@ -21,38 +17,30 @@ class YachtForm(ModelForm):
             "yacht_class",
             "yacht_club",
             "phrf_rating",
-            "spinnaker_adjust",
+            "spinnaker_class",
         )
 
 
-# class YachtRegisterForm(forms.Form):
-#     name = forms.CharField(
-#         label="Yacht Register", max_length=100, required=False
-#     )
-#     skipper = forms.IntegerField(label="Skipper", required=False)
-#     bio = forms.CharField(
-#         label="Yacht Bio",
-#         max_length=500,
-#         required=False,
-#         widget=forms.Textarea,
-#     )
+class YachtClubForm(ModelForm):
+    class Meta:
+        model = YachtClub
 
 
-# class YachtClubForm(ModelForm):
-#     class Meta:
-#         model = YachtClub
+class SeriesForm(ModelForm):
+    class Meta:
+        model = Series
 
 
-# class Series(ModelForm):
-#     class Meta:
-#         model = Series
+class EventForm(ModelForm):
+    class Meta:
+        model = Event
 
 
-# class Event(ModelForm):
-#     class Meta:
-#         model = Event
+class ResultForm(ModelForm):
+    class Meta:
+        model = Result
 
 
-# class Result(ModelForm):
-#     class Meta:
-#         model = Result
+class SpinnakerForm(ModelForm):
+    class Meta:
+        model = Result

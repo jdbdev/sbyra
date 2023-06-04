@@ -34,8 +34,7 @@ User = settings.AUTH_USER_MODEL
 
 
 """ 
-All models related to yacht racing, including yachts, yacht clubs, events and results. This file contains only models.Model classes. 
-Refer to separate files for;
+All models related to yacht racing. This file contains only models.Model classes. Refer to separate files for;
 
 managers.py (all models.Manager classes and custom methods)
 signals.py (all receiver functions and signals)
@@ -45,7 +44,7 @@ sbyra_src.utils (project level utility functions and validators)
 - Models to remain explicit and include help_text.
 - Do not include null=True in CharField unless unique=True and blank=True are set together
 - Do not include null=True in EmailField, CharField, SlugField
-- Keep model methods minimal and use other modules for additional functionality when possible
+- Keep model methods minimal and use other modules for additional functionality when possible (utils)
 - Use on_delete=SET_NULL to preserve data entries
 - Stay DRY and Keep common attributes and functionality in RacingCommon abstract model class.
 
@@ -87,7 +86,8 @@ class YachtClub(RacingCommon):
         help_text=_("enter yacht club name"),
     )
     slug = models.SlugField(
-        blank=True,
+        blank=True,  # required for signal to function
+        null=True,  # required for signal to function
         help_text=_("web safe url"),
     )
     city = models.CharField(
@@ -103,7 +103,7 @@ class YachtClub(RacingCommon):
         _("postal code"),
         max_length=7,
         blank=True,
-        help_text=_("format: A1AA1A"),
+        help_text=_("format: A1A1A1"),
         validators=[validate_postal_code],
     )
     contact_first_name = models.CharField(
@@ -138,7 +138,7 @@ class Spinnaker(RacingCommon):
         verbose_name="spinnaker class",
     )
     adjustment_value = models.IntegerField(
-        max_length=3,
+        default=0,
         help_text=_("phrf correction value based on spinnaker class"),
         verbose_name="spinnaker class adjustment",
     )
@@ -208,7 +208,8 @@ class Yacht(RacingCommon):
         Spinnaker,  # Many-to-one relationship,
         blank=True,
         null=True,
-        on_delete=models.SET_NULL,
+        on_delete=models.SET,
+        help_text=_("chose spinnaker class"),
     )
     is_active = models.BooleanField(
         default=False,
@@ -258,7 +259,7 @@ class Series(RacingCommon):
         default=True,
         help_text=_(
             "archived if not current year"
-        ),  # needs celevery script for periodic status check
+        ),  # needs celery script for periodic status check
     )
     notes = models.TextField(
         max_length=500, help_text=_("maximum 500 characters")
@@ -395,10 +396,12 @@ class Result(RacingCommon):
         # Additional phrf adjustment based on spinnaker use and yacht's spinnaker class:
         if used_spinnaker:
             phrf_rating = int(
-                (self.yacht.phrf_rating) - (self.yacht.spinnaker_adjust)
+                (self.yacht.phrf_rating)
+                - (self.yacht.spinnaker_class.adjustment_value)
             )
         else:
             phrf_rating = int(self.yacht.phrf_rating)
+
         time_correction_factor = 650 / (520 + phrf_rating)
         start_time = self.yacht_class_start
         finish_time = self.finish_time
